@@ -1,4 +1,4 @@
-package com.markp.util;
+package com.markp.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -15,11 +15,11 @@ import java.util.Map;
 import java.util.function.Function;
 
 @Component
-public class JwtUtil {
+public class JwtService {
 
     private final Key key;
 
-    public JwtUtil(@Value("${jwt.secret}") String secret) {
+    public JwtService(@Value("${jwt.secret}") String secret) {
         byte[] decodedKey = Base64.getDecoder().decode(secret);
         this.key = Keys.hmacShaKeyFor(decodedKey);
     }

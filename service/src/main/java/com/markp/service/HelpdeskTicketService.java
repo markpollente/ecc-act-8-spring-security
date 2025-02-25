@@ -24,4 +24,6 @@ public interface HelpdeskTicketService {
     HelpdeskTicketDto assignTicketToEmployee(Long ticketId, Long employeeId, String updatedBy);
 
     HelpdeskTicketDto addRemarkAndUpdateStatus(Long ticketId, String remarks, String status, String updatedBy);
+
+    HelpdeskTicketDto addRemarkAndUpdateStatusForEmployee(Long ticketId, String remarks, String status, String updatedBy);
 }

@@ -6,10 +6,11 @@ import com.markp.dto.LoginRequest;
 import com.markp.dto.LoginResponse;
 import com.markp.service.EmployeeService;
 import com.markp.service.HelpdeskTicketService;
-import com.markp.util.JwtUtil;
+import com.markp.security.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
@@ -43,7 +45,7 @@ public class EmployeeController {
     private UserDetailsService userDetailsService;
 
     @Autowired
-    private JwtUtil jwtUtil;
+    private JwtService jwtService;
 
     @PostMapping("/register")
     public ResponseEntity<EmployeeDto> registerEmployee(@RequestBody EmployeeDto employeeDto) {
@@ -57,29 +59,26 @@ public class EmployeeController {
                 new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
         );
         final UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.getEmail());
-        final String jwt = jwtUtil.generateToken(userDetails);
+        final String jwt = jwtService.generateToken(userDetails);
         return ResponseEntity.ok(new LoginResponse(jwt));
     }
 
     @GetMapping("/profile")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public ResponseEntity<EmployeeDto> getEmployeeProfile(Principal principal) {
         EmployeeDto employeeDto = employeeService.getEmployeeByEmail(principal.getName());
         return ResponseEntity.ok(employeeDto);
     }
 
-    @PutMapping("/profile")
-    public ResponseEntity<EmployeeDto> updateEmployeeProfile(Principal principal, @RequestBody EmployeeDto employeeDto) {
-        EmployeeDto updatedEmployee = employeeService.updateEmployeeByEmail(principal.getName(), employeeDto);
-        return ResponseEntity.ok(updatedEmployee);
-    }
-
     @GetMapping("/profile/filed")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public ResponseEntity<List<HelpdeskTicketDto>> getFiledTickets(Principal principal) {
         List<HelpdeskTicketDto> tickets = helpdeskTicketService.getTicketsByCreator(principal.getName());
         return ResponseEntity.ok(tickets);
     }
 
     @GetMapping("/profile/assigned")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public ResponseEntity<List<HelpdeskTicketDto>> getAssignedTickets(Principal principal) {
         EmployeeDto employee = employeeService.getEmployeeByEmail(principal.getName());
         List<HelpdeskTicketDto> tickets = helpdeskTicketService.getTicketsByAssignee(employee.getId());
@@ -87,24 +86,28 @@ public class EmployeeController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<EmployeeDto> createEmployee(@RequestBody EmployeeDto employeeDto) {
         EmployeeDto savedEmployee = employeeService.createEmployee(employeeDto);
         return new ResponseEntity<>(savedEmployee, HttpStatus.CREATED);
     }
 
     @GetMapping("{id}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<EmployeeDto> getEmployeeById(@PathVariable("id") Long employeeId) {
         EmployeeDto employeeDto = employeeService.getEmployeeById(employeeId);
         return ResponseEntity.ok(employeeDto);
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<List<EmployeeDto>> getAllEmployees() {
         List<EmployeeDto> employees = employeeService.getAllEmployees();
         return ResponseEntity.ok(employees);
     }
 
     @PutMapping("{id}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<EmployeeDto> updateEmployee(@PathVariable("id") Long employeeId,
                                                       @RequestBody EmployeeDto updatedEmployee) {
         EmployeeDto employeeDto = employeeService.updateEmployee(employeeId, updatedEmployee);
@@ -112,15 +115,27 @@ public class EmployeeController {
     }
 
     @DeleteMapping("{id}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<String> deleteEmployee(@PathVariable("id") Long employeeId) {
         employeeService.deleteEmployee(employeeId);
         return ResponseEntity.ok("Employee deleted successfully.");
     }
 
     @PutMapping("{employeeId}/assign-role/{roleId}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<EmployeeDto> assignRoleToEmployee(@PathVariable("employeeId") Long employeeId,
                                                             @PathVariable("roleId") Long roleId) {
         EmployeeDto employeeDto = employeeService.assignRoleToEmployee(employeeId, roleId);
         return ResponseEntity.ok(employeeDto);
+    }
+
+    @PutMapping("/profile/assigned/{ticketId}/remark")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
+    public ResponseEntity<HelpdeskTicketDto> addRemarkAndUpdateStatusForEmployee(@PathVariable("ticketId") Long ticketId,
+                                                                                 @RequestParam("remarks") String remarks,
+                                                                                 @RequestParam("status") String status,
+                                                                                 Principal principal) {
+        HelpdeskTicketDto ticketDto = helpdeskTicketService.addRemarkAndUpdateStatusForEmployee(ticketId, remarks, status, principal.getName());
+        return ResponseEntity.ok(ticketDto);
     }
 }

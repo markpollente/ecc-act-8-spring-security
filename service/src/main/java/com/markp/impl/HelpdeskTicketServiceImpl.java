@@ -165,6 +165,33 @@ public class HelpdeskTicketServiceImpl implements HelpdeskTicketService {
         return HelpdeskTicketMapper.mapToHelpdeskTicketDto(updatedTicket);
     }
 
+    @Override
+    @Transactional
+    @LogExecutionTime
+    public HelpdeskTicketDto addRemarkAndUpdateStatusForEmployee(Long ticketId, String remarks, String status, String updatedBy) {
+        HelpdeskTicket ticket = ticketRepository.findById(ticketId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Ticket does not exist with given id: " + ticketId));
+        Employee employee = employeeRepository.findByEmail(updatedBy);
+        if (employee == null) {
+            throw new ResourceNotFoundException("Employee does not exist with given email: " + updatedBy);
+        }
+        if (!ticket.getAssignee().getId().equals(employee.getId())) {
+            throw new ResourceNotFoundException("You are not authorized to update this ticket.");
+        }
+
+        ticket.setRemarks(remarks);
+        try {
+            ticket.setStatus(TicketStatus.valueOf(status.toUpperCase()));
+        } catch (IllegalArgumentException e) {
+            throw new ResourceNotFoundException("Invalid status: '" + status + "'. Valid statuses are: " +
+                    Arrays.stream(TicketStatus.values()).map(Enum::name).collect(Collectors.joining(", ")), e);
+        }
+        ticket.setUpdatedBy(updatedBy);
+        HelpdeskTicket updatedTicket = ticketRepository.save(ticket);
+        return HelpdeskTicketMapper.mapToHelpdeskTicketDto(updatedTicket);
+    }
+
     private String generateTicketNo() {
         Random random = new Random();
         int number = random.nextInt(99999);
