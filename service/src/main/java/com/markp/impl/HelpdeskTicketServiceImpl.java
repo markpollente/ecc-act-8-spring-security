@@ -11,6 +11,8 @@ import com.markp.repository.EmployeeRepository;
 import com.markp.repository.HelpdeskTicketRepository;
 import com.markp.service.HelpdeskTicketService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -64,10 +66,9 @@ public class HelpdeskTicketServiceImpl implements HelpdeskTicketService {
     @Override
     @Transactional(readOnly = true)
     @LogExecutionTime
-    public List<HelpdeskTicketDto> getAllTickets() {
-        List<HelpdeskTicket> tickets = ticketRepository.findAll();
-        return tickets.stream().map(HelpdeskTicketMapper::mapToHelpdeskTicketDto)
-                .collect(Collectors.toList());
+    public Page<HelpdeskTicketDto> getAllTickets(int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        return ticketRepository.findAll(pageRequest).map(helpdeskTicketMapper::toDto);
     }
 
     @Override

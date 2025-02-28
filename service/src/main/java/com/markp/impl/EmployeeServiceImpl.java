@@ -13,6 +13,8 @@ import com.markp.repository.HelpdeskTicketRepository;
 import com.markp.repository.RoleRepository;
 import com.markp.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -77,10 +79,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     @Transactional(readOnly = true)
     @LogExecutionTime
-    public List<EmployeeDto> getAllEmployees() {
-        List<Employee> employees = employeeRepository.findAll();
-        return employees.stream().map(EmployeeMapper::mapToEmployeeDto)
-                .collect(Collectors.toList());
+    public Page<EmployeeDto> getAllEmployees(int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        return employeeRepository.findAll(pageRequest).map(employeeMapper::toDto);
     }
 
     @Override

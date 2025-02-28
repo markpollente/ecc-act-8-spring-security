@@ -1,6 +1,7 @@
 package com.markp.service;
 
 import com.markp.dto.HelpdeskTicketDto;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -9,7 +10,7 @@ public interface HelpdeskTicketService {
 
     HelpdeskTicketDto getTicketById(Long ticketId);
 
-    List<HelpdeskTicketDto> getAllTickets();
+    Page<HelpdeskTicketDto> getAllTickets(int page, int size);
 
     List<HelpdeskTicketDto> getTicketsByStatus(String status);
 

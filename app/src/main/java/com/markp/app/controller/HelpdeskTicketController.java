@@ -3,6 +3,7 @@ package com.markp.app.controller;
 import com.markp.dto.HelpdeskTicketDto;
 import com.markp.service.HelpdeskTicketService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -42,8 +43,11 @@ public class HelpdeskTicketController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<List<HelpdeskTicketDto>> getAllTickets() {
-        List<HelpdeskTicketDto> tickets = ticketService.getAllTickets();
+    public ResponseEntity<Page<HelpdeskTicketDto>> getAllTickets(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Page<HelpdeskTicketDto> tickets = ticketService.getAllTickets(page, size);
         return ResponseEntity.ok(tickets);
     }
 
