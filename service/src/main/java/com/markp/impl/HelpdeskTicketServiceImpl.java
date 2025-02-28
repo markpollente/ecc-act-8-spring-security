@@ -6,7 +6,7 @@ import com.markp.logging.LogExecutionTime;
 import com.markp.mapper.HelpdeskTicketMapper;
 import com.markp.model.Employee;
 import com.markp.model.HelpdeskTicket;
-import com.markp.model.TicketStatus;
+import com.markp.model.enums.TicketStatus;
 import com.markp.repository.EmployeeRepository;
 import com.markp.repository.HelpdeskTicketRepository;
 import com.markp.service.HelpdeskTicketService;
@@ -28,6 +28,9 @@ public class HelpdeskTicketServiceImpl implements HelpdeskTicketService {
     @Autowired
     private EmployeeRepository employeeRepository;
 
+    @Autowired
+    HelpdeskTicketMapper helpdeskTicketMapper;
+
     @Override
     @Transactional
     @LogExecutionTime
@@ -38,12 +41,13 @@ public class HelpdeskTicketServiceImpl implements HelpdeskTicketService {
         if (ticketDto.getBody() == null || ticketDto.getBody().isEmpty()) {
             throw new ResourceNotFoundException("Body is required");
         }
-        HelpdeskTicket ticket = HelpdeskTicketMapper.mapToHelpdeskTicket(ticketDto);
+        HelpdeskTicket ticket = helpdeskTicketMapper.toEntity(ticketDto);
         ticket.setCreatedBy(createdBy);
+        ticket.setUpdatedBy(createdBy);
         ticket.setStatus(TicketStatus.DRAFT);
         ticket.setTicketNo(generateTicketNo());
         HelpdeskTicket savedTicket = ticketRepository.save(ticket);
-        return HelpdeskTicketMapper.mapToHelpdeskTicketDto(savedTicket);
+        return helpdeskTicketMapper.toDto(savedTicket);
     }
 
     @Override
@@ -54,7 +58,7 @@ public class HelpdeskTicketServiceImpl implements HelpdeskTicketService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Ticket does not exist with given id: " + ticketId));
 
-        return HelpdeskTicketMapper.mapToHelpdeskTicketDto(ticket);
+        return helpdeskTicketMapper.toDto(ticket);
     }
 
     @Override
@@ -77,7 +81,7 @@ public class HelpdeskTicketServiceImpl implements HelpdeskTicketService {
             throw new ResourceNotFoundException("Invalid status: '" + status + "'. Valid statuses are: " +
                     Arrays.stream(TicketStatus.values()).map(Enum::name).collect(Collectors.joining(", ")), e);
         }
-        return tickets.stream().map(HelpdeskTicketMapper::mapToHelpdeskTicketDto)
+        return tickets.stream().map(helpdeskTicketMapper::toDto)
                 .collect(Collectors.toList());
     }
 
@@ -86,7 +90,7 @@ public class HelpdeskTicketServiceImpl implements HelpdeskTicketService {
     @LogExecutionTime
     public List<HelpdeskTicketDto> getTicketsByAssignee(Long assigneeId) {
         List<HelpdeskTicket> tickets = ticketRepository.findByAssigneeId(assigneeId);
-        return tickets.stream().map(HelpdeskTicketMapper::mapToHelpdeskTicketDto)
+        return tickets.stream().map(helpdeskTicketMapper::toDto)
                 .collect(Collectors.toList());
     }
 
@@ -95,7 +99,7 @@ public class HelpdeskTicketServiceImpl implements HelpdeskTicketService {
     @LogExecutionTime
     public List<HelpdeskTicketDto> getTicketsByCreator(String createdBy) {
         List<HelpdeskTicket> tickets = ticketRepository.findByCreatedBy(createdBy);
-        return tickets.stream().map(HelpdeskTicketMapper::mapToHelpdeskTicketDto)
+        return tickets.stream().map(helpdeskTicketMapper::toDto)
                 .collect(Collectors.toList());
     }
 
@@ -115,7 +119,7 @@ public class HelpdeskTicketServiceImpl implements HelpdeskTicketService {
         }
 
         HelpdeskTicket updatedTicketObj = ticketRepository.save(ticket);
-        return HelpdeskTicketMapper.mapToHelpdeskTicketDto(updatedTicketObj);
+        return helpdeskTicketMapper.toDto(updatedTicketObj);
     }
 
     @Override
@@ -143,7 +147,7 @@ public class HelpdeskTicketServiceImpl implements HelpdeskTicketService {
         ticket.setStatus(TicketStatus.FILED);
         ticket.setUpdatedBy(updatedBy);
         HelpdeskTicket updatedTicket = ticketRepository.save(ticket);
-        return HelpdeskTicketMapper.mapToHelpdeskTicketDto(updatedTicket);
+        return helpdeskTicketMapper.toDto(updatedTicket);
     }
 
     @Override
@@ -162,7 +166,7 @@ public class HelpdeskTicketServiceImpl implements HelpdeskTicketService {
         }
         ticket.setUpdatedBy(updatedBy);
         HelpdeskTicket updatedTicket = ticketRepository.save(ticket);
-        return HelpdeskTicketMapper.mapToHelpdeskTicketDto(updatedTicket);
+        return helpdeskTicketMapper.toDto(updatedTicket);
     }
 
     @Override
@@ -189,7 +193,7 @@ public class HelpdeskTicketServiceImpl implements HelpdeskTicketService {
         }
         ticket.setUpdatedBy(updatedBy);
         HelpdeskTicket updatedTicket = ticketRepository.save(ticket);
-        return HelpdeskTicketMapper.mapToHelpdeskTicketDto(updatedTicket);
+        return helpdeskTicketMapper.toDto(updatedTicket);
     }
 
     private String generateTicketNo() {

@@ -25,6 +25,9 @@ public class RoleServiceImpl implements RoleService {
     @Autowired
     private EmployeeRepository employeeRepository;
 
+    @Autowired
+    private RoleMapper roleMapper;
+
     @Override
     @Transactional
     @LogExecutionTime
@@ -32,9 +35,9 @@ public class RoleServiceImpl implements RoleService {
         if (roleDto.getName() == null || roleDto.getName().isEmpty()) {
             throw new ResourceNotFoundException("Role name is required");
         }
-        Role role = RoleMapper.mapToRole(roleDto);
+        Role role = roleMapper.toEntity(roleDto);
         Role savedRole = roleRepository.save(role);
-        return RoleMapper.mapToRoleDto(savedRole);
+        return roleMapper.toDto(savedRole);
     }
 
     @Override
@@ -44,7 +47,7 @@ public class RoleServiceImpl implements RoleService {
         Role role = roleRepository.findById(roleId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Role does not exist with given id: " + roleId));
-        return RoleMapper.mapToRoleDto(role);
+        return roleMapper.toDto(role);
     }
 
     @Override
@@ -52,7 +55,7 @@ public class RoleServiceImpl implements RoleService {
     @LogExecutionTime
     public List<RoleDto> getAllRoles() {
         List<Role> roles = roleRepository.findAll();
-        return roles.stream().map(RoleMapper::mapToRoleDto)
+        return roles.stream().map(roleMapper::toDto)
                 .collect(Collectors.toList());
     }
 
@@ -66,7 +69,7 @@ public class RoleServiceImpl implements RoleService {
         role.setName(updatedRole.getName());
         role.setDescription(updatedRole.getDescription());
         Role updatedRoleObj = roleRepository.save(role);
-        return RoleMapper.mapToRoleDto(updatedRoleObj);
+        return roleMapper.toDto(updatedRoleObj);
     }
 
     @Override

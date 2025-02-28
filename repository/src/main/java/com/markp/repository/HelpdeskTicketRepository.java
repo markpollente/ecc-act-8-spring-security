@@ -1,7 +1,7 @@
 package com.markp.repository;
 
 import com.markp.model.HelpdeskTicket;
-import com.markp.model.TicketStatus;
+import com.markp.model.enums.TicketStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

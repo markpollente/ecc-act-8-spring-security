@@ -5,7 +5,7 @@ import com.markp.exception.ResourceNotFoundException;
 import com.markp.impl.HelpdeskTicketServiceImpl;
 import com.markp.model.Employee;
 import com.markp.model.HelpdeskTicket;
-import com.markp.model.TicketStatus;
+import com.markp.model.enums.TicketStatus;
 import com.markp.repository.EmployeeRepository;
 import com.markp.repository.HelpdeskTicketRepository;
 import org.junit.jupiter.api.BeforeEach;

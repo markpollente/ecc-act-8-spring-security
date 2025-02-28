@@ -35,10 +35,16 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private EmployeeMapper employeeMapper;
+
+    @Autowired
+    private RoleMapper roleMapper;
+
     @Override
     @Transactional
     @LogExecutionTime
-    public EmployeeDto createEmployee(EmployeeDto employeeDto) {
+    public EmployeeDto createEmployee(EmployeeDto employeeDto, String createdBy) {
         if (employeeDto.getFirstName() == null || employeeDto.getFirstName().isEmpty()) {
             throw new ResourceNotFoundException("First name is required.");
         }
@@ -50,10 +56,12 @@ public class EmployeeServiceImpl implements EmployeeService {
         } else if (employeeRepository.existsByEmail(employeeDto.getEmail())) {
             throw new ResourceNotFoundException("Email already exists: " + employeeDto.getEmail());
         }
-        Employee employee = EmployeeMapper.mapToEmployee(employeeDto);
+        Employee employee = employeeMapper.toEntity(employeeDto);
+        employee.setCreatedBy(createdBy);
+        employee.setUpdatedBy(createdBy);
         employee.setPassword(passwordEncoder.encode(employeeDto.getPassword()));
         Employee savedEmployee = employeeRepository.save(employee);
-        return EmployeeMapper.mapToEmployeeDto(savedEmployee);
+        return employeeMapper.toDto(savedEmployee);
     }
 
     @Override
@@ -63,7 +71,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee employee = employeeRepository.findById(employeeId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Employee does not exist with given id: " + employeeId));
-        return EmployeeMapper.mapToEmployeeDto(employee);
+        return employeeMapper.toDto(employee);
     }
 
     @Override
@@ -78,7 +86,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     @Transactional
     @LogExecutionTime
-    public EmployeeDto updateEmployee(Long employeeId, EmployeeDto updatedEmployee) {
+    public EmployeeDto updateEmployee(Long employeeId, EmployeeDto updatedEmployee, String updatedBy) {
         Employee employee = employeeRepository.findById(employeeId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Employee does not exist with given id: " + employeeId));
@@ -93,16 +101,17 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setAddress(updatedEmployee.getAddress());
         employee.setContactNumber(updatedEmployee.getContactNumber());
         employee.setEmploymentStatus(updatedEmployee.getEmploymentStatus());
+        employee.setUpdatedBy(updatedBy);
         if (updatedEmployee.getPassword() != null && !updatedEmployee.getPassword().isEmpty()) {
             employee.setPassword(passwordEncoder.encode(updatedEmployee.getPassword()));
         }
         if (updatedEmployee.getRoles() != null) {
             employee.setRoles(updatedEmployee.getRoles().stream()
-                    .map(RoleMapper::mapToRole)
+                    .map(roleMapper::toEntity)
                     .collect(Collectors.toList()));
         }
         Employee updatedEmployeeObj = employeeRepository.save(employee);
-        return EmployeeMapper.mapToEmployeeDto(updatedEmployeeObj);
+        return employeeMapper.toDto(updatedEmployeeObj);
     }
 
     @Override
@@ -123,7 +132,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     @Transactional
     @LogExecutionTime
-    public EmployeeDto assignRoleToEmployee(Long employeeId, Long roleId) {
+    public EmployeeDto assignRoleToEmployee(Long employeeId, Long roleId, String updatedBy) {
         Employee employee = employeeRepository.findById(employeeId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Employee does not exist with given id: " + employeeId));
@@ -133,8 +142,9 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (employee.getRoles().stream().noneMatch(r -> r.getId().equals(roleId))) {
             employee.getRoles().add(role);
         }
+        employee.setUpdatedBy(updatedBy);
         Employee updatedEmployee = employeeRepository.save(employee);
-        return EmployeeMapper.mapToEmployeeDto(updatedEmployee);
+        return employeeMapper.toDto(updatedEmployee);
     }
 
     @Override
@@ -145,37 +155,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (employee == null) {
             throw new ResourceNotFoundException("Employee does not exist with given email: " + email);
         }
-        return EmployeeMapper.mapToEmployeeDto(employee);
-    }
-
-    @Override
-    @Transactional
-    @LogExecutionTime
-    public EmployeeDto updateEmployeeByEmail(String email, EmployeeDto updatedEmployee) {
-        Employee employee = employeeRepository.findByEmail(email);
-        if (employee == null) {
-            throw new ResourceNotFoundException("Employee does not exist with given email: " + email);
-        }
-        if (!updatedEmployee.getEmail().equals(employee.getEmail()) &&
-                employeeRepository.existsByEmail(updatedEmployee.getEmail())) {
-            throw new ResourceNotFoundException("Email already exists: " + updatedEmployee.getEmail());
-        }
-        employee.setFirstName(updatedEmployee.getFirstName());
-        employee.setLastName(updatedEmployee.getLastName());
-        employee.setEmail(updatedEmployee.getEmail());
-        employee.setAge(updatedEmployee.getAge());
-        employee.setAddress(updatedEmployee.getAddress());
-        employee.setContactNumber(updatedEmployee.getContactNumber());
-        employee.setEmploymentStatus(updatedEmployee.getEmploymentStatus());
-        if (updatedEmployee.getPassword() != null && !updatedEmployee.getPassword().isEmpty()) {
-            employee.setPassword(passwordEncoder.encode(updatedEmployee.getPassword()));
-        }
-        if (updatedEmployee.getRoles() != null) {
-            employee.setRoles(updatedEmployee.getRoles().stream()
-                    .map(RoleMapper::mapToRole)
-                    .collect(Collectors.toList()));
-        }
-        Employee updatedEmployeeObj = employeeRepository.save(employee);
-        return EmployeeMapper.mapToEmployeeDto(updatedEmployeeObj);
+        return employeeMapper.toDto(employee);
     }
 }

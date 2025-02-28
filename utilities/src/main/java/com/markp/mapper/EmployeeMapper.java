@@ -2,48 +2,18 @@ package com.markp.mapper;
 
 import com.markp.dto.EmployeeDto;
 import com.markp.model.Employee;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
-import java.util.stream.Collectors;
+@Mapper(componentModel = "spring", uses = {RoleMapper.class})
+public interface EmployeeMapper {
 
-public class EmployeeMapper {
+    @Mapping(target = "roles", source = "roles")
+    EmployeeDto toDto(Employee entity);
 
-    public static EmployeeDto mapToEmployeeDto(Employee employee) {
-        if (employee == null) {
-            return null;
-        }
-        return new EmployeeDto(
-                employee.getId(),
-                employee.getFirstName(),
-                employee.getLastName(),
-                employee.getEmail(),
-                employee.getAge(),
-                employee.getAddress(),
-                employee.getContactNumber(),
-                employee.getEmploymentStatus(),
-                employee.getPassword(),
-                employee.getRoles() != null ? employee.getRoles().stream()
-                        .map(RoleMapper::mapToRoleDto)
-                        .collect(Collectors.toList()) : null
-        );
-    }
+    @Mapping(target = "roles", source = "roles")
+    Employee toEntity(EmployeeDto dto);
 
-    public static Employee mapToEmployee(EmployeeDto employeeDto) {
-        if (employeeDto == null) {
-            return null;
-        }
-        return new Employee(
-                employeeDto.getId(),
-                employeeDto.getFirstName(),
-                employeeDto.getLastName(),
-                employeeDto.getEmail(),
-                employeeDto.getAge(),
-                employeeDto.getAddress(),
-                employeeDto.getContactNumber(),
-                employeeDto.getEmploymentStatus(),
-                employeeDto.getPassword(),
-                employeeDto.getRoles() != null ? employeeDto.getRoles().stream()
-                        .map(RoleMapper::mapToRole)
-                        .collect(Collectors.toList()) : null
-        );
-    }
+    void updateEntityFromDto(EmployeeDto dto, @MappingTarget Employee entity);
 }

@@ -2,38 +2,18 @@ package com.markp.mapper;
 
 import com.markp.dto.HelpdeskTicketDto;
 import com.markp.model.HelpdeskTicket;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
-public class HelpdeskTicketMapper {
+@Mapper(componentModel = "spring", uses = {EmployeeMapper.class})
+public interface HelpdeskTicketMapper {
 
-    public static HelpdeskTicketDto mapToHelpdeskTicketDto(HelpdeskTicket ticket) {
-        return new HelpdeskTicketDto(
-                ticket.getId(),
-                ticket.getTicketNo(),
-                ticket.getTitle(),
-                ticket.getBody(),
-                EmployeeMapper.mapToEmployeeDto(ticket.getAssignee()),
-                ticket.getStatus(),
-                ticket.getCreatedDate(),
-                ticket.getCreatedBy(),
-                ticket.getUpdatedDate(),
-                ticket.getUpdatedBy(),
-                ticket.getRemarks()
-        );
-    }
+    @Mapping(target = "assignee", source = "assignee")
+    HelpdeskTicketDto toDto(HelpdeskTicket entity);
 
-    public static HelpdeskTicket mapToHelpdeskTicket(HelpdeskTicketDto ticketDto) {
-        return new HelpdeskTicket(
-                ticketDto.getId(),
-                ticketDto.getTicketNo(),
-                ticketDto.getTitle(),
-                ticketDto.getBody(),
-                ticketDto.getAssignee() != null ? EmployeeMapper.mapToEmployee(ticketDto.getAssignee()) : null,
-                ticketDto.getStatus(),
-                null,
-                null,
-                null,
-                null,
-                ticketDto.getRemarks()
-        );
-    }
+    @Mapping(target = "assignee", source = "assignee")
+    HelpdeskTicket toEntity(HelpdeskTicketDto dto);
+
+    void updateEntityFromDto(HelpdeskTicketDto dto, @MappingTarget HelpdeskTicket entity);
 }

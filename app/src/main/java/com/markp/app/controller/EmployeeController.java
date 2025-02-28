@@ -2,11 +2,11 @@ package com.markp.app.controller;
 
 import com.markp.dto.EmployeeDto;
 import com.markp.dto.HelpdeskTicketDto;
-import com.markp.dto.LoginRequest;
-import com.markp.dto.LoginResponse;
+import com.markp.dto.request.LoginRequest;
+import com.markp.dto.response.LoginResponse;
+import com.markp.security.JwtService;
 import com.markp.service.EmployeeService;
 import com.markp.service.HelpdeskTicketService;
-import com.markp.security.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,12 +47,6 @@ public class EmployeeController {
     @Autowired
     private JwtService jwtService;
 
-    @PostMapping("/register")
-    public ResponseEntity<EmployeeDto> registerEmployee(@RequestBody EmployeeDto employeeDto) {
-        EmployeeDto savedEmployee = employeeService.createEmployee(employeeDto);
-        return new ResponseEntity<>(savedEmployee, HttpStatus.CREATED);
-    }
-
     @PostMapping("/authenticate")
     public ResponseEntity<LoginResponse> authenticateEmployee(@RequestBody LoginRequest loginRequest) {
         authenticationManager.authenticate(
@@ -87,8 +81,8 @@ public class EmployeeController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<EmployeeDto> createEmployee(@RequestBody EmployeeDto employeeDto) {
-        EmployeeDto savedEmployee = employeeService.createEmployee(employeeDto);
+    public ResponseEntity<EmployeeDto> createEmployee(@RequestBody EmployeeDto employeeDto, Principal principal) {
+        EmployeeDto savedEmployee = employeeService.createEmployee(employeeDto, principal.getName());
         return new ResponseEntity<>(savedEmployee, HttpStatus.CREATED);
     }
 
@@ -109,8 +103,9 @@ public class EmployeeController {
     @PutMapping("{id}")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<EmployeeDto> updateEmployee(@PathVariable("id") Long employeeId,
-                                                      @RequestBody EmployeeDto updatedEmployee) {
-        EmployeeDto employeeDto = employeeService.updateEmployee(employeeId, updatedEmployee);
+                                                      @RequestBody EmployeeDto updatedEmployee,
+                                                      Principal principal) {
+        EmployeeDto employeeDto = employeeService.updateEmployee(employeeId, updatedEmployee, principal.getName());
         return ResponseEntity.ok(employeeDto);
     }
 
@@ -124,8 +119,9 @@ public class EmployeeController {
     @PutMapping("{employeeId}/assign-role/{roleId}")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<EmployeeDto> assignRoleToEmployee(@PathVariable("employeeId") Long employeeId,
-                                                            @PathVariable("roleId") Long roleId) {
-        EmployeeDto employeeDto = employeeService.assignRoleToEmployee(employeeId, roleId);
+                                                            @PathVariable("roleId") Long roleId,
+                                                            Principal principal) {
+        EmployeeDto employeeDto = employeeService.assignRoleToEmployee(employeeId, roleId, principal.getName());
         return ResponseEntity.ok(employeeDto);
     }
 

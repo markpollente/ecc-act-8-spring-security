@@ -1,5 +1,6 @@
 package com.markp.model;
 
+import com.markp.model.enums.TicketStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -14,10 +15,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -25,7 +22,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Entity
 @Table(name = "helpdesk_tickets")
-public class HelpdeskTicket {
+public class HelpdeskTicket extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,20 +44,6 @@ public class HelpdeskTicket {
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private TicketStatus status;
-
-    @CreationTimestamp
-    @Column(name = "created_date", updatable = false)
-    private LocalDateTime createdDate;
-
-    @Column(name = "created_by")
-    private String createdBy;
-
-    @UpdateTimestamp
-    @Column(name = "updated_date")
-    private LocalDateTime updatedDate;
-
-    @Column(name = "updated_by")
-    private String updatedBy;
 
     @Column(name = "remarks")
     private String remarks;

@@ -2,23 +2,15 @@ package com.markp.mapper;
 
 import com.markp.dto.RoleDto;
 import com.markp.model.Role;
+import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
 
-public class RoleMapper {
+@Mapper(componentModel = "spring")
+public interface RoleMapper {
 
-    public static RoleDto mapToRoleDto(Role role) {
-        return new RoleDto(
-                role.getId(),
-                role.getName(),
-                role.getDescription()
-        );
-    }
+    RoleDto toDto(Role entity);
 
-    public static Role mapToRole(RoleDto roleDto) {
-        return new Role(
-                roleDto.getId(),
-                roleDto.getName(),
-                roleDto.getDescription(),
-                null
-        );
-    }
+    Role toEntity(RoleDto dto);
+
+    void updateEntityFromDto(RoleDto dto, @MappingTarget Role entity);
 }
