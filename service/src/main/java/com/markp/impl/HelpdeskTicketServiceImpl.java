@@ -193,9 +193,18 @@ public class HelpdeskTicketServiceImpl implements HelpdeskTicketService {
         return helpdeskTicketMapper.toDto(updatedTicket);
     }
 
-    private String generateTicketNo() {
-        Random random = new Random();
-        int number = random.nextInt(99999);
-        return "Ticket #" + String.format("%05d", number);
+    @Override
+    @Transactional(readOnly = true)
+    @LogExecutionTime
+    public List<HelpdeskTicketDto> getTicketsByStatusAndDateCreated(String status, LocalDateTime startDate, LocalDateTime endDate) {
+        List<HelpdeskTicket> tickets;
+        try {
+            tickets = ticketRepository.findByStatusAndCreatedDateBetweenAndDeletedFalse(TicketStatus.valueOf(status.toUpperCase()), startDate, endDate);
+
+        } catch (IllegalArgumentException e) {
+            throw new ResourceNotFoundException("Invalid status: '" + status + "'. Valid statuses are: " +
+                    Arrays.stream(TicketStatus.values()).map(Enum::name).collect(Collectors.joining(", ")), e);
+        }
+        return tickets.stream().map(helpdeskTicketMapper::toDto).collect(Collectors.toList());
     }
 }

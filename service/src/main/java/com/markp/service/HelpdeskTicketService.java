@@ -27,4 +27,6 @@ public interface HelpdeskTicketService {
     HelpdeskTicketDto addRemarkAndUpdateStatus(Long ticketId, String remarks, String status, String updatedBy);
 
     HelpdeskTicketDto addRemarkAndUpdateStatusForEmployee(Long ticketId, String remarks, String status, String updatedBy);
+
+    List<HelpdeskTicketDto> getTicketsByStatusAndDateCreated(String status, LocalDateTime startDate, LocalDateTime endDate);
 }

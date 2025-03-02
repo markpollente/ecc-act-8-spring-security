@@ -100,4 +100,14 @@ public class HelpdeskTicketController {
         HelpdeskTicketDto ticketDto = ticketService.addRemarkAndUpdateStatus(ticketId, remarks, status, principal.getName());
         return ResponseEntity.ok(ticketDto);
     }
+
+    @GetMapping("/filter")
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    public ResponseEntity<List<HelpdeskTicketDto>> getTicketsByStatusAndDateCreated(
+            @RequestParam("status") String status,
+            @RequestParam("startDate") LocalDateTime startDate,
+            @RequestParam("endDate") LocalDateTime endDate) {
+        List<HelpdeskTicketDto> tickets = ticketService.getTicketsByStatusAndDateCreated(status, startDate, endDate);
+        return ResponseEntity.ok(tickets);
+    }
 }
