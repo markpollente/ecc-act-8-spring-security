@@ -3,6 +3,7 @@ package com.markp.app.controller;
 import com.markp.dto.RoleDto;
 import com.markp.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,8 +14,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -26,8 +29,8 @@ public class RoleController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<RoleDto> createRole(@RequestBody RoleDto roleDto) {
-        RoleDto savedRole = roleService.createRole(roleDto);
+    public ResponseEntity<RoleDto> createRole(@RequestBody RoleDto roleDto, Principal principal) {
+        RoleDto savedRole = roleService.createRole(roleDto, principal.getName());
         return new ResponseEntity<>(savedRole, HttpStatus.CREATED);
     }
 
@@ -40,16 +43,20 @@ public class RoleController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<List<RoleDto>> getAllRoles() {
-        List<RoleDto> roles = roleService.getAllRoles();
+    public ResponseEntity<Page<RoleDto>> getAllRoles(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Page<RoleDto> roles = roleService.getAllRoles(page, size);
         return ResponseEntity.ok(roles);
     }
 
     @PutMapping("{id}")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<RoleDto> updateRole(@PathVariable("id") Long roleId,
-                                              @RequestBody RoleDto updatedRole) {
-        RoleDto roleDto = roleService.updateRole(roleId, updatedRole);
+                                              @RequestBody RoleDto updatedRole,
+                                              Principal principal) {
+        RoleDto roleDto = roleService.updateRole(roleId, updatedRole, principal.getName());
         return ResponseEntity.ok(roleDto);
     }
 

@@ -10,8 +10,9 @@ import java.time.LocalDateTime;
 public abstract class BaseDto {
 
     private Long id;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private LocalDateTime createdDate;
+    private LocalDateTime updatedDate;
     private String createdBy;
     private String updatedBy;
+    private boolean deleted;
 }

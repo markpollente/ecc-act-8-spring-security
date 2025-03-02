@@ -10,11 +10,13 @@ import com.markp.repository.EmployeeRepository;
 import com.markp.repository.RoleRepository;
 import com.markp.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class RoleServiceImpl implements RoleService {
@@ -31,11 +33,13 @@ public class RoleServiceImpl implements RoleService {
     @Override
     @Transactional
     @LogExecutionTime
-    public RoleDto createRole(RoleDto roleDto) {
+    public RoleDto createRole(RoleDto roleDto, String createdBy) {
         if (roleDto.getName() == null || roleDto.getName().isEmpty()) {
             throw new ResourceNotFoundException("Role name is required");
         }
         Role role = roleMapper.toEntity(roleDto);
+        role.setCreatedBy(createdBy);
+        role.setUpdatedBy(createdBy);
         Role savedRole = roleRepository.save(role);
         return roleMapper.toDto(savedRole);
     }
@@ -44,7 +48,7 @@ public class RoleServiceImpl implements RoleService {
     @Transactional(readOnly = true)
     @LogExecutionTime
     public RoleDto getRoleByID(Long roleId) {
-        Role role = roleRepository.findById(roleId)
+        Role role = roleRepository.findByActive(roleId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Role does not exist with given id: " + roleId));
         return roleMapper.toDto(role);
@@ -53,21 +57,21 @@ public class RoleServiceImpl implements RoleService {
     @Override
     @Transactional(readOnly = true)
     @LogExecutionTime
-    public List<RoleDto> getAllRoles() {
-        List<Role> roles = roleRepository.findAll();
-        return roles.stream().map(roleMapper::toDto)
-                .collect(Collectors.toList());
+    public Page<RoleDto> getAllRoles(int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        return roleRepository.findAllActive(pageRequest).map(roleMapper::toDto);
     }
 
     @Override
     @Transactional
     @LogExecutionTime
-    public RoleDto updateRole(Long roleId, RoleDto updatedRole) {
-        Role role = roleRepository.findById(roleId)
+    public RoleDto updateRole(Long roleId, RoleDto updatedRole, String updatedBy) {
+        Role role = roleRepository.findByActive(roleId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Role does not exist with given id: " + roleId));
         role.setName(updatedRole.getName());
         role.setDescription(updatedRole.getDescription());
+        role.setUpdatedBy(updatedBy);
         Role updatedRoleObj = roleRepository.save(role);
         return roleMapper.toDto(updatedRoleObj);
     }
@@ -76,7 +80,7 @@ public class RoleServiceImpl implements RoleService {
     @Transactional
     @LogExecutionTime
     public void deleteRole(Long roleId) {
-        Role role = roleRepository.findById(roleId)
+        Role role = roleRepository.findByActive(roleId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Role does not exist with given id: " + roleId));
         List<Employee> employees = employeeRepository.findAll();
@@ -86,6 +90,7 @@ public class RoleServiceImpl implements RoleService {
                 employeeRepository.save(employee);
             }
         }
-        roleRepository.deleteById(roleId);
+        role.setDeleted(true);
+        roleRepository.save(role);
     }
 }

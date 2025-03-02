@@ -29,11 +29,11 @@ public abstract class BaseEntity {
 
     @Column(nullable = false, updatable = false)
     @CreationTimestamp
-    private LocalDateTime createdAt;
+    private LocalDateTime createdDate;
 
     @Column(nullable = false)
     @UpdateTimestamp
-    private LocalDateTime updatedAt;
+    private LocalDateTime updatedDate;
 
     @Column(nullable = false, updatable = false)
     @CreatedBy
@@ -43,4 +43,6 @@ public abstract class BaseEntity {
     @LastModifiedBy
     private String updatedBy;
 
+    @Column
+    private boolean deleted = false;
 }

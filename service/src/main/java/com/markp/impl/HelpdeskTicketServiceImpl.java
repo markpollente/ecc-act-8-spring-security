@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -43,7 +44,6 @@ public class HelpdeskTicketServiceImpl implements HelpdeskTicketService {
         ticket.setCreatedBy(createdBy);
         ticket.setUpdatedBy(createdBy);
         ticket.setStatus(TicketStatus.DRAFT);
-        ticket.setTicketNo(generateTicketNo());
         HelpdeskTicket savedTicket = ticketRepository.save(ticket);
         return helpdeskTicketMapper.toDto(savedTicket);
     }
@@ -52,10 +52,9 @@ public class HelpdeskTicketServiceImpl implements HelpdeskTicketService {
     @Transactional(readOnly = true)
     @LogExecutionTime
     public HelpdeskTicketDto getTicketById(Long ticketId) {
-        HelpdeskTicket ticket = ticketRepository.findById(ticketId)
+        HelpdeskTicket ticket = ticketRepository.findByActive(ticketId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Ticket does not exist with given id: " + ticketId));
-
         return helpdeskTicketMapper.toDto(ticket);
     }
 
@@ -64,7 +63,7 @@ public class HelpdeskTicketServiceImpl implements HelpdeskTicketService {
     @LogExecutionTime
     public Page<HelpdeskTicketDto> getAllTickets(int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
-        return ticketRepository.findAll(pageRequest).map(helpdeskTicketMapper::toDto);
+        return ticketRepository.findAllActive(pageRequest).map(helpdeskTicketMapper::toDto);
     }
 
     @Override
@@ -73,7 +72,7 @@ public class HelpdeskTicketServiceImpl implements HelpdeskTicketService {
     public List<HelpdeskTicketDto> getTicketsByStatus(String status) {
         List<HelpdeskTicket> tickets;
         try {
-            tickets = ticketRepository.findByStatus(TicketStatus.valueOf(status.toUpperCase()));
+            tickets = ticketRepository.findByStatusAndDeletedFalse(TicketStatus.valueOf(status.toUpperCase()));
         } catch (IllegalArgumentException e) {
             throw new ResourceNotFoundException("Invalid status: '" + status + "'. Valid statuses are: " +
                     Arrays.stream(TicketStatus.values()).map(Enum::name).collect(Collectors.joining(", ")), e);
@@ -86,7 +85,7 @@ public class HelpdeskTicketServiceImpl implements HelpdeskTicketService {
     @Transactional(readOnly = true)
     @LogExecutionTime
     public List<HelpdeskTicketDto> getTicketsByAssignee(Long assigneeId) {
-        List<HelpdeskTicket> tickets = ticketRepository.findByAssigneeId(assigneeId);
+        List<HelpdeskTicket> tickets = ticketRepository.findByAssigneeIdAndDeletedFalse(assigneeId);
         return tickets.stream().map(helpdeskTicketMapper::toDto)
                 .collect(Collectors.toList());
     }
@@ -95,7 +94,7 @@ public class HelpdeskTicketServiceImpl implements HelpdeskTicketService {
     @Transactional(readOnly = true)
     @LogExecutionTime
     public List<HelpdeskTicketDto> getTicketsByCreator(String createdBy) {
-        List<HelpdeskTicket> tickets = ticketRepository.findByCreatedBy(createdBy);
+        List<HelpdeskTicket> tickets = ticketRepository.findByCreatedByAndDeletedFalse(createdBy);
         return tickets.stream().map(helpdeskTicketMapper::toDto)
                 .collect(Collectors.toList());
     }
@@ -104,7 +103,7 @@ public class HelpdeskTicketServiceImpl implements HelpdeskTicketService {
     @Transactional
     @LogExecutionTime
     public HelpdeskTicketDto updateTicket(Long ticketId, HelpdeskTicketDto updatedTicket, String updatedBy) {
-        HelpdeskTicket ticket = ticketRepository.findById(ticketId)
+        HelpdeskTicket ticket = ticketRepository.findByActive(ticketId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Ticket does not exist with given id: " + ticketId));
         ticket.setTitle(updatedTicket.getTitle());
@@ -123,21 +122,21 @@ public class HelpdeskTicketServiceImpl implements HelpdeskTicketService {
     @Transactional
     @LogExecutionTime
     public void deleteTicket(Long ticketId) {
-        HelpdeskTicket ticket = ticketRepository.findById(ticketId)
+        HelpdeskTicket ticket = ticketRepository.findByActive(ticketId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Ticket does not exist with given id: " + ticketId));
-
-        ticketRepository.deleteById(ticketId);
+        ticket.setDeleted(true);
+        ticketRepository.save(ticket);
     }
 
     @Override
     @Transactional
     @LogExecutionTime
     public HelpdeskTicketDto assignTicketToEmployee(Long ticketId, Long employeeId, String updatedBy) {
-        HelpdeskTicket ticket = ticketRepository.findById(ticketId)
+        HelpdeskTicket ticket = ticketRepository.findByActive(ticketId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Ticket does not exist with given id: " + ticketId));
-        Employee employee = employeeRepository.findById(employeeId)
+        Employee employee = employeeRepository.findByActive(employeeId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Employee does not exist with given id: " + employeeId));
         ticket.setAssignee(employee);
@@ -151,7 +150,7 @@ public class HelpdeskTicketServiceImpl implements HelpdeskTicketService {
     @Transactional
     @LogExecutionTime
     public HelpdeskTicketDto addRemarkAndUpdateStatus(Long ticketId, String remarks, String status, String updatedBy) {
-        HelpdeskTicket ticket = ticketRepository.findById(ticketId)
+        HelpdeskTicket ticket = ticketRepository.findByActive(ticketId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Ticket does not exist with given id: " + ticketId));
         ticket.setRemarks(remarks);
@@ -170,10 +169,10 @@ public class HelpdeskTicketServiceImpl implements HelpdeskTicketService {
     @Transactional
     @LogExecutionTime
     public HelpdeskTicketDto addRemarkAndUpdateStatusForEmployee(Long ticketId, String remarks, String status, String updatedBy) {
-        HelpdeskTicket ticket = ticketRepository.findById(ticketId)
+        HelpdeskTicket ticket = ticketRepository.findByActive(ticketId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Ticket does not exist with given id: " + ticketId));
-        Employee employee = employeeRepository.findByEmail(updatedBy);
+        Employee employee = employeeRepository.findByEmailAndDeletedFalse(updatedBy);
         if (employee == null) {
             throw new ResourceNotFoundException("Employee does not exist with given email: " + updatedBy);
         }

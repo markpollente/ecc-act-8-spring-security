@@ -10,11 +10,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -29,7 +32,7 @@ public class HelpdeskTicket extends BaseEntity {
     private Long id;
 
     @Column(name = "ticket_no", nullable = false, unique = true, updatable = false)
-    private String ticketNo;
+    private UUID ticketNo;
 
     @Column(name = "title", nullable = false)
     private String title;
@@ -47,4 +50,9 @@ public class HelpdeskTicket extends BaseEntity {
 
     @Column(name = "remarks")
     private String remarks;
+
+    @PrePersist
+    protected void onCreate() {
+        this.ticketNo = UUID.randomUUID();
+    }
 }

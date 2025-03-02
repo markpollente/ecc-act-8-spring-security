@@ -2,12 +2,17 @@ package com.markp.repository;
 
 import com.markp.model.HelpdeskTicket;
 import com.markp.model.enums.TicketStatus;
-import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
-public interface HelpdeskTicketRepository extends JpaRepository<HelpdeskTicket, Long> {
-    List<HelpdeskTicket> findByStatus(TicketStatus status);
-    List<HelpdeskTicket> findByAssigneeId(Long assigneeId);
-    List<HelpdeskTicket> findByCreatedBy(String email);
+public interface HelpdeskTicketRepository extends BaseRepository<HelpdeskTicket, Long> {
+
+    List<HelpdeskTicket> findByStatusAndDeletedFalse(TicketStatus status);
+
+    List<HelpdeskTicket> findByAssigneeIdAndDeletedFalse(Long assigneeId);
+
+    List<HelpdeskTicket> findByCreatedByAndDeletedFalse(String email);
+
+    List<HelpdeskTicket> findByStatusAndCreatedDateBetweenAndDeletedFalse(TicketStatus status, LocalDateTime startDate, LocalDateTime endDate);
 }
