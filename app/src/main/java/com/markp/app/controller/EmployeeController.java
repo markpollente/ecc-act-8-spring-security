@@ -7,6 +7,7 @@ import com.markp.dto.response.LoginResponse;
 import com.markp.security.JwtService;
 import com.markp.service.EmployeeService;
 import com.markp.service.HelpdeskTicketService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -82,7 +83,7 @@ public class EmployeeController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<EmployeeDto> createEmployee(@RequestBody EmployeeDto employeeDto, Principal principal) {
+    public ResponseEntity<EmployeeDto> createEmployee(@Valid @RequestBody EmployeeDto employeeDto, Principal principal) {
         EmployeeDto savedEmployee = employeeService.createEmployee(employeeDto, principal.getName());
         return new ResponseEntity<>(savedEmployee, HttpStatus.CREATED);
     }

@@ -15,8 +15,14 @@ import java.util.List;
 public class EmployeeDto extends BaseDto {
     private Long id;
 
+    @NotBlank(message = "First name is required")
     private String firstName;
+
+    @NotBlank(message = "Last name is required")
     private String lastName;
+
+    @Email(message = "Email should be valid")
+    @NotBlank(message = "Email is required")
     private String email;
     private Integer age;
     private String address;

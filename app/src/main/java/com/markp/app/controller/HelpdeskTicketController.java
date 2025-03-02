@@ -2,6 +2,7 @@ package com.markp.app.controller;
 
 import com.markp.dto.HelpdeskTicketDto;
 import com.markp.service.HelpdeskTicketService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -29,7 +30,7 @@ public class HelpdeskTicketController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
-    public ResponseEntity<HelpdeskTicketDto> createTicket(@RequestBody HelpdeskTicketDto ticketDto, Principal principal) {
+    public ResponseEntity<HelpdeskTicketDto> createTicket(@Valid @RequestBody HelpdeskTicketDto ticketDto, Principal principal) {
         HelpdeskTicketDto savedTicket = ticketService.createTicket(ticketDto, principal.getName());
         return new ResponseEntity<>(savedTicket, HttpStatus.CREATED);
     }

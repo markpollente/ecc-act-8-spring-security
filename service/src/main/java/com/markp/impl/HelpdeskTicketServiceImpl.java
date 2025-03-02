@@ -15,12 +15,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+@Validated
 @Service
 public class HelpdeskTicketServiceImpl implements HelpdeskTicketService {
 
@@ -37,12 +39,6 @@ public class HelpdeskTicketServiceImpl implements HelpdeskTicketService {
     @Transactional
     @LogExecutionTime
     public HelpdeskTicketDto createTicket(HelpdeskTicketDto ticketDto, String createdBy) {
-        if (ticketDto.getTitle() == null || ticketDto.getTitle().isEmpty()) {
-            throw new ResourceNotFoundException("Title is required");
-        }
-        if (ticketDto.getBody() == null || ticketDto.getBody().isEmpty()) {
-            throw new ResourceNotFoundException("Body is required");
-        }
         HelpdeskTicket ticket = helpdeskTicketMapper.toEntity(ticketDto);
         ticket.setCreatedBy(createdBy);
         ticket.setUpdatedBy(createdBy);
