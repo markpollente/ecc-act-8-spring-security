@@ -14,6 +14,7 @@ import com.markp.repository.RoleRepository;
 import com.markp.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -74,9 +75,32 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     @Transactional(readOnly = true)
     @LogExecutionTime
-    public Page<EmployeeDto> getAllEmployees(int page, int size) {
+    public Page<EmployeeDto> getAllEmployees(int page, int size,
+                                             String firstName, String lastName,
+                                             String email, String employmentStatus,
+                                             LocalDateTime createdDateStart, LocalDateTime createdDateEnd,
+                                             LocalDateTime updatedDateStart, LocalDateTime updatedDateEnd) {
         PageRequest pageRequest = PageRequest.of(page, size);
-        return employeeRepository.findAllActive(pageRequest).map(employeeMapper::toDto);
+
+        // fetch non-encrypted filters
+        Page<Employee> employeesPage = employeeRepository.findAllWithNonEncryptedFilters(
+                email, employmentStatus, createdDateStart, createdDateEnd, updatedDateStart, updatedDateEnd, pageRequest);
+
+        List<Employee> employees = employeesPage.getContent();
+
+        // filter in memory for encrypted fields
+        List<Employee> filteredEmployees = employees.stream()
+                .filter(employee -> (firstName == null || employee.getFirstName().toLowerCase().contains(firstName.toLowerCase())))
+                .filter(employee -> (lastName == null || employee.getLastName().toLowerCase().contains(lastName.toLowerCase())))
+                .collect(Collectors.toList());
+
+        int start = Math.min((int) pageRequest.getOffset(), filteredEmployees.size());
+        int end = Math.min((start + pageRequest.getPageSize()), filteredEmployees.size());
+        List<EmployeeDto> employeeDtos = filteredEmployees.subList(start, end).stream()
+                .map(employeeMapper::toDto)
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(employeeDtos, pageRequest, filteredEmployees.size());
     }
 
     @Override

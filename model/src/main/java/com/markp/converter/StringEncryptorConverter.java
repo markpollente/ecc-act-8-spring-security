@@ -38,6 +38,9 @@ public class StringEncryptorConverter implements AttributeConverter<String, Stri
 
     @Override
     public String convertToDatabaseColumn(String attribute) {
+        if (attribute == null) {
+            return null;
+        }
         try {
             Cipher cipher = Cipher.getInstance(AES);
             cipher.init(Cipher.ENCRYPT_MODE, key);
@@ -49,6 +52,9 @@ public class StringEncryptorConverter implements AttributeConverter<String, Stri
 
     @Override
     public String convertToEntityAttribute(String dbData) {
+        if (dbData == null) {
+            return null;
+        }
         try {
             Cipher cipher = Cipher.getInstance(AES);
             cipher.init(Cipher.DECRYPT_MODE, key);
