@@ -11,7 +11,11 @@ public interface HelpdeskTicketService {
 
     HelpdeskTicketDto getTicketById(Long ticketId);
 
-    Page<HelpdeskTicketDto> getAllTickets(int page, int size);
+    Page<HelpdeskTicketDto> getAllTickets(int page, int size,
+                                          String ticketNo, String title,
+                                          String body,String status, String assignee,
+                                          LocalDateTime createdDateStart, LocalDateTime createdDateEnd,
+                                          LocalDateTime updatedDateStart, LocalDateTime updatedDateEnd);
 
     List<HelpdeskTicketDto> getTicketsByStatus(String status);
 
@@ -28,6 +32,4 @@ public interface HelpdeskTicketService {
     HelpdeskTicketDto addRemarkAndUpdateStatus(Long ticketId, String remarks, String status, String updatedBy);
 
     HelpdeskTicketDto addRemarkAndUpdateStatusForEmployee(Long ticketId, String remarks, String status, String updatedBy);
-
-    List<HelpdeskTicketDto> getTicketsByStatusAndDateCreated(String status, LocalDateTime startDate, LocalDateTime endDate);
 }

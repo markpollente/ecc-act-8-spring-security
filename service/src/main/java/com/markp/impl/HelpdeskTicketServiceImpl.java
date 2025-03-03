@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Validated
@@ -61,9 +62,28 @@ public class HelpdeskTicketServiceImpl implements HelpdeskTicketService {
     @Override
     @Transactional(readOnly = true)
     @LogExecutionTime
-    public Page<HelpdeskTicketDto> getAllTickets(int page, int size) {
+    public Page<HelpdeskTicketDto> getAllTickets(int page, int size, String ticketNo, String title, String body, String status, String assignee, LocalDateTime createdDateStart, LocalDateTime createdDateEnd, LocalDateTime updatedDateStart, LocalDateTime updatedDateEnd) {
         PageRequest pageRequest = PageRequest.of(page, size);
-        return ticketRepository.findAllActive(pageRequest).map(helpdeskTicketMapper::toDto);
+        UUID ticketNoUUID = null;
+        if (ticketNo != null && !ticketNo.isEmpty()) {
+            try {
+                ticketNoUUID = UUID.fromString(ticketNo);
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid ticket number format. It should be a valid UUID.");
+            }
+        }
+        TicketStatus ticketStatus = null;
+        if (status != null && !status.isEmpty()) {
+            try {
+                ticketStatus = TicketStatus.valueOf(status.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid status: '" + status + "'. Valid statuses are: " +
+                        Arrays.stream(TicketStatus.values()).map(Enum::name).collect(Collectors.joining(", ")), e);
+            }
+        }
+        return ticketRepository
+                .findAllWithFilters(ticketNoUUID, title, body, ticketStatus, assignee, createdDateStart, createdDateEnd, updatedDateStart, updatedDateEnd, pageRequest)
+                .map(helpdeskTicketMapper::toDto);
     }
 
     @Override
@@ -190,20 +210,5 @@ public class HelpdeskTicketServiceImpl implements HelpdeskTicketService {
         ticket.setUpdatedBy(updatedBy);
         HelpdeskTicket updatedTicket = ticketRepository.save(ticket);
         return helpdeskTicketMapper.toDto(updatedTicket);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    @LogExecutionTime
-    public List<HelpdeskTicketDto> getTicketsByStatusAndDateCreated(String status, LocalDateTime startDate, LocalDateTime endDate) {
-        List<HelpdeskTicket> tickets;
-        try {
-            tickets = ticketRepository.findByStatusAndCreatedDateBetweenAndDeletedFalse(TicketStatus.valueOf(status.toUpperCase()), startDate, endDate);
-
-        } catch (IllegalArgumentException e) {
-            throw new ResourceNotFoundException("Invalid status: '" + status + "'. Valid statuses are: " +
-                    Arrays.stream(TicketStatus.values()).map(Enum::name).collect(Collectors.joining(", ")), e);
-        }
-        return tickets.stream().map(helpdeskTicketMapper::toDto).collect(Collectors.toList());
     }
 }

@@ -5,6 +5,7 @@ import com.markp.service.HelpdeskTicketService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -47,9 +48,17 @@ public class HelpdeskTicketController {
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<Page<HelpdeskTicketDto>> getAllTickets(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-        Page<HelpdeskTicketDto> tickets = ticketService.getAllTickets(page, size);
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String ticketNo,
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String body,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String assignee,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime createdDateStart,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime createdDateEnd,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime updatedDateStart,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime updatedDateEnd) {
+        Page<HelpdeskTicketDto> tickets = ticketService.getAllTickets(page, size, ticketNo, title, body, status, assignee, createdDateStart, createdDateEnd, updatedDateStart, updatedDateEnd);
         return ResponseEntity.ok(tickets);
     }
 
@@ -100,15 +109,5 @@ public class HelpdeskTicketController {
                                                                       Principal principal) {
         HelpdeskTicketDto ticketDto = ticketService.addRemarkAndUpdateStatus(ticketId, remarks, status, principal.getName());
         return ResponseEntity.ok(ticketDto);
-    }
-
-    @GetMapping("/filter")
-    @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<List<HelpdeskTicketDto>> getTicketsByStatusAndDateCreated(
-            @RequestParam("status") String status,
-            @RequestParam("startDate") LocalDateTime startDate,
-            @RequestParam("endDate") LocalDateTime endDate) {
-        List<HelpdeskTicketDto> tickets = ticketService.getTicketsByStatusAndDateCreated(status, startDate, endDate);
-        return ResponseEntity.ok(tickets);
     }
 }
