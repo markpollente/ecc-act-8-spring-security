@@ -1,5 +1,7 @@
 package com.markp.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.validation.constraints.Email;
@@ -34,7 +36,10 @@ public class EmployeeDto extends BaseDto {
     private String address;
     private String contactNumber;
     private String employmentStatus;
+
+    @JsonProperty(access = Access.WRITE_ONLY)
     private String password;
+
     private List<RoleDto> roles;
 
     @PrePersist

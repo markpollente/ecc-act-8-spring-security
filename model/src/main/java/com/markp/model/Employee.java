@@ -80,9 +80,4 @@ public class Employee extends BaseEntity {
         }
         return Period.between(birthday, LocalDate.now()).getYears();
     }
-
-    @JsonProperty(access = Access.WRITE_ONLY)
-    public String getPassword() {
-        return password;
-    }
 }
