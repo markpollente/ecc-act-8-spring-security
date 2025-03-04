@@ -20,7 +20,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EmployeeDto extends BaseDto {
-    private Long id;
 
     @NotBlank(message = "First name is required")
     private String firstName;

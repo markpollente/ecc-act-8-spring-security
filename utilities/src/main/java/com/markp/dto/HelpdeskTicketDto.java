@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class HelpdeskTicketDto extends BaseDto {
-    private Long id;
     private String ticketNo;
 
     @NotBlank(message = "Title is required")

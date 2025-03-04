@@ -27,10 +27,6 @@ import java.util.UUID;
 @Table(name = "helpdesk_tickets")
 public class HelpdeskTicket extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     @Column(name = "ticket_no", nullable = false, unique = true, updatable = false)
     private UUID ticketNo;
 

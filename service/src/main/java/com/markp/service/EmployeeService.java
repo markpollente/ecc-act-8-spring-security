@@ -4,7 +4,6 @@ import com.markp.dto.EmployeeDto;
 import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 public interface EmployeeService {
     EmployeeDto createEmployee(EmployeeDto employeeDto, String createdBy);

@@ -32,10 +32,6 @@ import java.util.List;
 @Table(name = "employees")
 public class Employee extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     @Column(name = "first_name", nullable = false)
     @Convert(converter = StringEncryptorConverter.class)
     private String firstName;
@@ -63,7 +59,6 @@ public class Employee extends BaseEntity {
     @Column(name = "employment_status")
     private String employmentStatus;
 
-    @JsonIgnore
     private String password;
 
     @ManyToMany(fetch = FetchType.EAGER)

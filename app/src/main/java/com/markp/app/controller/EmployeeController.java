@@ -51,11 +51,11 @@ public class EmployeeController {
     @Autowired
     private JwtService jwtService;
 
+    // testing purposes
     @PostMapping("/register")
     public ResponseEntity<EmployeeDto> registerEmployee(@RequestBody EmployeeDto employeeDto) {
         EmployeeDto savedEmployee = employeeService.createEmployee(employeeDto, "system");
         return new ResponseEntity<>(savedEmployee, HttpStatus.CREATED);
-
     }
 
     @PostMapping("/authenticate")
