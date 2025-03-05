@@ -32,8 +32,8 @@ public class HelpdeskTicketController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
-    public ResponseEntity<HelpdeskTicketDto> createTicket(@Valid @RequestBody HelpdeskTicketDto ticketDto, Principal principal) {
-        HelpdeskTicketDto savedTicket = ticketService.createTicket(ticketDto, principal.getName());
+    public ResponseEntity<HelpdeskTicketDto> createTicket(@Valid @RequestBody HelpdeskTicketDto ticketDto) {
+        HelpdeskTicketDto savedTicket = ticketService.createTicket(ticketDto);
         return new ResponseEntity<>(savedTicket, HttpStatus.CREATED);
     }
 
@@ -79,9 +79,8 @@ public class HelpdeskTicketController {
     @PutMapping("{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public ResponseEntity<HelpdeskTicketDto> updateTicket(@PathVariable("id") Long ticketId,
-                                                          @RequestBody HelpdeskTicketDto updatedTicket,
-                                                          Principal principal) {
-        HelpdeskTicketDto ticketDto = ticketService.updateTicket(ticketId, updatedTicket, principal.getName());
+                                                          @RequestBody HelpdeskTicketDto updatedTicket) {
+        HelpdeskTicketDto ticketDto = ticketService.updateTicket(ticketId, updatedTicket);
         return ResponseEntity.ok(ticketDto);
     }
 
@@ -95,9 +94,8 @@ public class HelpdeskTicketController {
     @PutMapping("{ticketId}/assign/{employeeId}")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<HelpdeskTicketDto> assignTicketToEmployee(@PathVariable("ticketId") Long ticketId,
-                                                                    @PathVariable("employeeId") Long employeeId,
-                                                                    Principal principal) {
-        HelpdeskTicketDto ticketDto = ticketService.assignTicketToEmployee(ticketId, employeeId, principal.getName());
+                                                                    @PathVariable("employeeId") Long employeeId) {
+        HelpdeskTicketDto ticketDto = ticketService.assignTicketToEmployee(ticketId, employeeId);
         return ResponseEntity.ok(ticketDto);
     }
 
@@ -105,9 +103,8 @@ public class HelpdeskTicketController {
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<HelpdeskTicketDto> addRemarkAndUpdateStatus(@PathVariable("ticketId") Long ticketId,
                                                                       @RequestParam("remarks") String remarks,
-                                                                      @RequestParam("status") String status,
-                                                                      Principal principal) {
-        HelpdeskTicketDto ticketDto = ticketService.addRemarkAndUpdateStatus(ticketId, remarks, status, principal.getName());
+                                                                      @RequestParam("status") String status) {
+        HelpdeskTicketDto ticketDto = ticketService.addRemarkAndUpdateStatus(ticketId, remarks, status);
         return ResponseEntity.ok(ticketDto);
     }
 }

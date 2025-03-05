@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface HelpdeskTicketService {
-    HelpdeskTicketDto createTicket(HelpdeskTicketDto ticketDto, String createdBy);
+    HelpdeskTicketDto createTicket(HelpdeskTicketDto ticketDto);
 
     HelpdeskTicketDto getTicketById(Long ticketId);
 
@@ -23,13 +23,13 @@ public interface HelpdeskTicketService {
 
     List<HelpdeskTicketDto> getTicketsByCreator(String createdBy);
 
-    HelpdeskTicketDto updateTicket(Long ticketId, HelpdeskTicketDto updatedTicket, String updatedBy);
+    HelpdeskTicketDto updateTicket(Long ticketId, HelpdeskTicketDto updatedTicket);
 
     void deleteTicket(Long ticketId);
 
-    HelpdeskTicketDto assignTicketToEmployee(Long ticketId, Long employeeId, String updatedBy);
+    HelpdeskTicketDto assignTicketToEmployee(Long ticketId, Long employeeId);
 
-    HelpdeskTicketDto addRemarkAndUpdateStatus(Long ticketId, String remarks, String status, String updatedBy);
+    HelpdeskTicketDto addRemarkAndUpdateStatus(Long ticketId, String remarks, String status);
 
     HelpdeskTicketDto addRemarkAndUpdateStatusForEmployee(Long ticketId, String remarks, String status, String updatedBy);
 }

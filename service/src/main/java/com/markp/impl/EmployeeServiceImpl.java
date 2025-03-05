@@ -54,13 +54,11 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Transactional
     @LogExecutionTime
     @CachePut(value = "employees", key = "#result.id")
-    public EmployeeDto createEmployee(EmployeeDto employeeDto, String createdBy) {
+    public EmployeeDto createEmployee(EmployeeDto employeeDto) {
         if (employeeRepository.existsByEmailAndDeletedFalse(employeeDto.getEmail())) {
             throw new ResourceNotFoundException("Email already exists: " + employeeDto.getEmail());
         }
         Employee employee = employeeMapper.toEntity(employeeDto);
-        employee.setCreatedBy(createdBy);
-        employee.setUpdatedBy(createdBy);
         employee.setPassword(passwordEncoder.encode(employeeDto.getPassword()));
         Employee savedEmployee = employeeRepository.save(employee);
         return employeeMapper.toDto(savedEmployee);
@@ -112,7 +110,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Transactional
     @LogExecutionTime
     @CachePut(value = "employees", key = "#employeeId")
-    public EmployeeDto updateEmployee(Long employeeId, EmployeeDto updatedEmployee, String updatedBy) {
+    public EmployeeDto updateEmployee(Long employeeId, EmployeeDto updatedEmployee) {
         Employee employee = employeeRepository.findByActive(employeeId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Employee does not exist with given id: " + employeeId));
@@ -128,7 +126,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setAddress(updatedEmployee.getAddress());
         employee.setContactNumber(updatedEmployee.getContactNumber());
         employee.setEmploymentStatus(updatedEmployee.getEmploymentStatus());
-        employee.setUpdatedBy(updatedBy);
         if (updatedEmployee.getPassword() != null && !updatedEmployee.getPassword().isEmpty()) {
             employee.setPassword(passwordEncoder.encode(updatedEmployee.getPassword()));
         }
@@ -162,7 +159,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Transactional
     @LogExecutionTime
     @CachePut(value = "employees", key = "#employeeId")
-    public EmployeeDto assignRoleToEmployee(Long employeeId, Long roleId, String updatedBy) {
+    public EmployeeDto assignRoleToEmployee(Long employeeId, Long roleId) {
         Employee employee = employeeRepository.findByActive(employeeId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Employee does not exist with given id: " + employeeId));
@@ -172,7 +169,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (employee.getRoles().stream().noneMatch(r -> r.getId().equals(roleId))) {
             employee.getRoles().add(role);
         }
-        employee.setUpdatedBy(updatedBy);
         Employee updatedEmployee = employeeRepository.save(employee);
         return employeeMapper.toDto(updatedEmployee);
     }

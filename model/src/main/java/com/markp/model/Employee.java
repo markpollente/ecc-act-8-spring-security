@@ -59,6 +59,7 @@ public class Employee extends BaseEntity {
     @Column(name = "employment_status")
     private String employmentStatus;
 
+    @Column(nullable = false)
     private String password;
 
     @ManyToMany(fetch = FetchType.EAGER)

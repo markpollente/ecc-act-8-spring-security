@@ -54,7 +54,7 @@ public class EmployeeController {
     // testing purposes
     @PostMapping("/register")
     public ResponseEntity<EmployeeDto> registerEmployee(@RequestBody EmployeeDto employeeDto) {
-        EmployeeDto savedEmployee = employeeService.createEmployee(employeeDto, "system");
+        EmployeeDto savedEmployee = employeeService.createEmployee(employeeDto);
         return new ResponseEntity<>(savedEmployee, HttpStatus.CREATED);
     }
 
@@ -92,8 +92,8 @@ public class EmployeeController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<EmployeeDto> createEmployee(@Valid @RequestBody EmployeeDto employeeDto, Principal principal) {
-        EmployeeDto savedEmployee = employeeService.createEmployee(employeeDto, principal.getName());
+    public ResponseEntity<EmployeeDto> createEmployee(@Valid @RequestBody EmployeeDto employeeDto) {
+        EmployeeDto savedEmployee = employeeService.createEmployee(employeeDto);
         return new ResponseEntity<>(savedEmployee, HttpStatus.CREATED);
     }
 
@@ -124,9 +124,8 @@ public class EmployeeController {
     @PutMapping("{id}")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<EmployeeDto> updateEmployee(@PathVariable("id") Long employeeId,
-                                                      @RequestBody EmployeeDto updatedEmployee,
-                                                      Principal principal) {
-        EmployeeDto employeeDto = employeeService.updateEmployee(employeeId, updatedEmployee, principal.getName());
+                                                      @RequestBody EmployeeDto updatedEmployee) {
+        EmployeeDto employeeDto = employeeService.updateEmployee(employeeId, updatedEmployee);
         return ResponseEntity.ok(employeeDto);
     }
 
@@ -140,9 +139,8 @@ public class EmployeeController {
     @PutMapping("{employeeId}/assign-role/{roleId}")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<EmployeeDto> assignRoleToEmployee(@PathVariable("employeeId") Long employeeId,
-                                                            @PathVariable("roleId") Long roleId,
-                                                            Principal principal) {
-        EmployeeDto employeeDto = employeeService.assignRoleToEmployee(employeeId, roleId, principal.getName());
+                                                            @PathVariable("roleId") Long roleId) {
+        EmployeeDto employeeDto = employeeService.assignRoleToEmployee(employeeId, roleId);
         return ResponseEntity.ok(employeeDto);
     }
 
