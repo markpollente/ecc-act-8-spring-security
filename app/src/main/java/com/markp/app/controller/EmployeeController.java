@@ -2,6 +2,7 @@ package com.markp.app.controller;
 
 import com.markp.dto.EmployeeDto;
 import com.markp.dto.HelpdeskTicketDto;
+import com.markp.dto.request.EmployeeFilterRequest;
 import com.markp.dto.request.LoginRequest;
 import com.markp.dto.response.LoginResponse;
 import com.markp.security.JwtService;
@@ -10,7 +11,7 @@ import com.markp.service.HelpdeskTicketService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,7 +30,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -106,18 +106,8 @@ public class EmployeeController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<Page<EmployeeDto>> getAllEmployees(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String firstName,
-            @RequestParam(required = false) String lastName,
-            @RequestParam(required = false) String email,
-            @RequestParam(required = false) String employmentStatus,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime createdDateStart,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime createdDateEnd,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime updatedDateStart,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime updatedDateEnd) {
-        Page<EmployeeDto> employees = employeeService.getAllEmployees(page, size, firstName, lastName, email, employmentStatus, createdDateStart, createdDateEnd, updatedDateStart, updatedDateEnd);
+    public ResponseEntity<Page<EmployeeDto>> getAllEmployees(EmployeeFilterRequest filterRequest, Pageable pageable) {
+        Page<EmployeeDto> employees = employeeService.getAllEmployees(filterRequest, pageable);
         return ResponseEntity.ok(employees);
     }
 

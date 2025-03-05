@@ -1,6 +1,7 @@
 package com.markp.impl;
 
 import com.markp.dto.HelpdeskTicketDto;
+import com.markp.dto.request.HelpdeskTicketFilterRequest;
 import com.markp.exception.ResourceNotFoundException;
 import com.markp.logging.LogExecutionTime;
 import com.markp.mapper.HelpdeskTicketMapper;
@@ -13,6 +14,7 @@ import com.markp.service.HelpdeskTicketService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -20,8 +22,6 @@ import org.springframework.validation.annotation.Validated;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Validated
@@ -60,19 +60,20 @@ public class HelpdeskTicketServiceImpl implements HelpdeskTicketService {
     @Override
     @Transactional(readOnly = true)
     @LogExecutionTime
-    public Page<HelpdeskTicketDto> getAllTickets(int page, int size, String ticketNo, String title, String body, String status, String assignee, LocalDateTime createdDateStart, LocalDateTime createdDateEnd, LocalDateTime updatedDateStart, LocalDateTime updatedDateEnd) {
-        PageRequest pageRequest = PageRequest.of(page, size);
+    public Page<HelpdeskTicketDto> getAllTickets(HelpdeskTicketFilterRequest filterRequest, Pageable pageable) {
         TicketStatus ticketStatus = null;
-        if (status != null && !status.isEmpty()) {
+        if (filterRequest.getStatus() != null && !filterRequest.getStatus().isEmpty()) {
             try {
-                ticketStatus = TicketStatus.valueOf(status.toUpperCase());
+                ticketStatus = TicketStatus.valueOf(filterRequest.getStatus().toUpperCase());
             } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("Invalid status: '" + status + "'. Valid statuses are: " +
+                throw new IllegalArgumentException("Invalid status: '" + filterRequest.getStatus() + "'. Valid statuses are: " +
                         Arrays.stream(TicketStatus.values()).map(Enum::name).collect(Collectors.joining(", ")), e);
             }
         }
         return ticketRepository
-                .findAllWithFilters(ticketNo, title, body, ticketStatus, assignee, createdDateStart, createdDateEnd, updatedDateStart, updatedDateEnd, pageRequest)
+                .findAllWithFilters(filterRequest.getTicketNo(), filterRequest.getTitle(), filterRequest.getBody(), ticketStatus,
+                        filterRequest.getAssignee(), filterRequest.getCreatedDateStart(), filterRequest.getCreatedDateEnd(),
+                        filterRequest.getUpdatedDateStart(), filterRequest.getUpdatedDateEnd(), pageable)
                 .map(helpdeskTicketMapper::toDto);
     }
 

@@ -1,9 +1,10 @@
 package com.markp.service;
 
 import com.markp.dto.HelpdeskTicketDto;
+import com.markp.dto.request.HelpdeskTicketFilterRequest;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface HelpdeskTicketService {
@@ -11,11 +12,7 @@ public interface HelpdeskTicketService {
 
     HelpdeskTicketDto getTicketById(Long ticketId);
 
-    Page<HelpdeskTicketDto> getAllTickets(int page, int size,
-                                          String ticketNo, String title,
-                                          String body,String status, String assignee,
-                                          LocalDateTime createdDateStart, LocalDateTime createdDateEnd,
-                                          LocalDateTime updatedDateStart, LocalDateTime updatedDateEnd);
+    Page<HelpdeskTicketDto> getAllTickets(HelpdeskTicketFilterRequest filterRequest, Pageable pageable);
 
     List<HelpdeskTicketDto> getTicketsByStatus(String status);
 

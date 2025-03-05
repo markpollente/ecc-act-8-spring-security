@@ -1,10 +1,12 @@
 package com.markp.app.controller;
 
 import com.markp.dto.HelpdeskTicketDto;
+import com.markp.dto.request.HelpdeskTicketFilterRequest;
 import com.markp.service.HelpdeskTicketService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -46,19 +48,8 @@ public class HelpdeskTicketController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<Page<HelpdeskTicketDto>> getAllTickets(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String ticketNo,
-            @RequestParam(required = false) String title,
-            @RequestParam(required = false) String body,
-            @RequestParam(required = false) String status,
-            @RequestParam(required = false) String assignee,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime createdDateStart,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime createdDateEnd,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime updatedDateStart,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime updatedDateEnd) {
-        Page<HelpdeskTicketDto> tickets = ticketService.getAllTickets(page, size, ticketNo, title, body, status, assignee, createdDateStart, createdDateEnd, updatedDateStart, updatedDateEnd);
+    public ResponseEntity<Page<HelpdeskTicketDto>> getAllTickets(HelpdeskTicketFilterRequest filterRequest, Pageable pageable) {
+        Page<HelpdeskTicketDto> tickets = ticketService.getAllTickets(filterRequest, pageable);
         return ResponseEntity.ok(tickets);
     }
 
