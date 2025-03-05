@@ -20,7 +20,7 @@ public interface HelpdeskTicketRepository extends BaseRepository<HelpdeskTicket,
     List<HelpdeskTicket> findByCreatedByAndDeletedFalse(String email);
 
     @Query("SELECT t FROM HelpdeskTicket t LEFT JOIN t.assignee e WHERE t.deleted = false " +
-            "AND (:ticketNo IS NULL OR t.ticketNo = :ticketNo) " +
+            "AND (:ticketNo IS NULL OR str(t.ticketNo) LIKE %:ticketNo%) " +
             "AND (:title IS NULL OR t.title LIKE %:title%) " +
             "AND (:body IS NULL OR t.body LIKE %:body%) " +
             "AND (:status IS NULL OR t.status = :status) " +
@@ -29,7 +29,7 @@ public interface HelpdeskTicketRepository extends BaseRepository<HelpdeskTicket,
             "AND (cast(:createdDateEnd as timestamp) IS NULL OR t.createdDate <= :createdDateEnd) " +
             "AND (cast(:updatedDateStart as timestamp) IS NULL OR t.updatedDate >= :updatedDateStart) " +
             "AND (cast(:updatedDateEnd as timestamp) IS NULL OR t.updatedDate <= :updatedDateEnd)")
-    Page<HelpdeskTicket> findAllWithFilters(@Param("ticketNo") UUID ticketNo,
+    Page<HelpdeskTicket> findAllWithFilters(@Param("ticketNo") String ticketNo,
                                             @Param("title") String title,
                                             @Param("body") String body,
                                             @Param("status") TicketStatus status,
