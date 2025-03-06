@@ -26,14 +26,18 @@ import java.util.stream.Collectors;
 @Service
 public class HelpdeskTicketServiceImpl implements HelpdeskTicketService {
 
-    @Autowired
-    private HelpdeskTicketRepository ticketRepository;
+    private final HelpdeskTicketRepository ticketRepository;
+    private final EmployeeRepository employeeRepository;
+    private final HelpdeskTicketMapper helpdeskTicketMapper;
 
     @Autowired
-    private EmployeeRepository employeeRepository;
-
-    @Autowired
-    HelpdeskTicketMapper helpdeskTicketMapper;
+    public HelpdeskTicketServiceImpl (HelpdeskTicketRepository ticketRepository,
+                                      EmployeeRepository employeeRepository,
+                                      HelpdeskTicketMapper helpdeskTicketMapper) {
+        this.ticketRepository = ticketRepository;
+        this.employeeRepository = employeeRepository;
+        this.helpdeskTicketMapper = helpdeskTicketMapper;
+    }
 
     @Override
     @Transactional

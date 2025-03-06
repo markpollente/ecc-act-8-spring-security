@@ -20,14 +20,18 @@ import java.util.List;
 @Service
 public class RoleServiceImpl implements RoleService {
 
-    @Autowired
-    private RoleRepository roleRepository;
+    private final RoleRepository roleRepository;
+    private final EmployeeRepository employeeRepository;
+    private final RoleMapper roleMapper;
 
     @Autowired
-    private EmployeeRepository employeeRepository;
-
-    @Autowired
-    private RoleMapper roleMapper;
+    public RoleServiceImpl (RoleRepository roleRepository,
+                            EmployeeRepository employeeRepository,
+                            RoleMapper roleMapper) {
+        this.roleRepository = roleRepository;
+        this.employeeRepository = employeeRepository;
+        this.roleMapper = roleMapper;
+    }
 
     @Override
     @Transactional

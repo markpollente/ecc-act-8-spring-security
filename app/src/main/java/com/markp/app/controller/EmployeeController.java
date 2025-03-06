@@ -36,26 +36,23 @@ import java.util.List;
 @RequestMapping("/api/employees")
 public class EmployeeController {
 
-    @Autowired
-    private EmployeeService employeeService;
+    private final EmployeeService employeeService;
+    private final HelpdeskTicketService helpdeskTicketService;
+    private final AuthenticationManager authenticationManager;
+    private final UserDetailsService userDetailsService;
+    private final JwtService jwtService;
 
     @Autowired
-    private HelpdeskTicketService helpdeskTicketService;
-
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private UserDetailsService userDetailsService;
-
-    @Autowired
-    private JwtService jwtService;
-
-    // testing purposes
-    @PostMapping("/register")
-    public ResponseEntity<EmployeeDto> registerEmployee(@RequestBody EmployeeDto employeeDto) {
-        EmployeeDto savedEmployee = employeeService.createEmployee(employeeDto);
-        return new ResponseEntity<>(savedEmployee, HttpStatus.CREATED);
+    public EmployeeController(EmployeeService employeeService,
+                              HelpdeskTicketService helpdeskTicketService,
+                              AuthenticationManager authenticationManager,
+                              UserDetailsService userDetailsService,
+                              JwtService jwtService) {
+        this.employeeService = employeeService;
+        this.helpdeskTicketService = helpdeskTicketService;
+        this.authenticationManager = authenticationManager;
+        this.userDetailsService = userDetailsService;
+        this.jwtService = jwtService;
     }
 
     @PostMapping("/authenticate")

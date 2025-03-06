@@ -19,11 +19,15 @@ import io.jsonwebtoken.ExpiredJwtException;
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private CustomUserDetailsService customUserDetailsService;
+    private final CustomUserDetailsService customUserDetailsService;
+    private final JwtService jwtService;
 
     @Autowired
-    private JwtService jwtService;
+    public JwtRequestFilter (CustomUserDetailsService customUserDetailsService,
+                             JwtService jwtService) {
+        this.customUserDetailsService = customUserDetailsService;
+        this.jwtService = jwtService;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
