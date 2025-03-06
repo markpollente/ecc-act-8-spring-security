@@ -36,13 +36,11 @@ public class RoleServiceImpl implements RoleService {
     @Override
     @Transactional
     @LogExecutionTime
-    public RoleDto createRole(RoleDto roleDto, String createdBy) {
+    public RoleDto createRole(RoleDto roleDto) {
         if (roleDto.getName() == null || roleDto.getName().isEmpty()) {
             throw new ResourceNotFoundException("Role name is required");
         }
         Role role = roleMapper.toEntity(roleDto);
-        role.setCreatedBy(createdBy);
-        role.setUpdatedBy(createdBy);
         Role savedRole = roleRepository.save(role);
         return roleMapper.toDto(savedRole);
     }
@@ -68,13 +66,12 @@ public class RoleServiceImpl implements RoleService {
     @Override
     @Transactional
     @LogExecutionTime
-    public RoleDto updateRole(Long roleId, RoleDto updatedRole, String updatedBy) {
+    public RoleDto updateRole(Long roleId, RoleDto updatedRole) {
         Role role = roleRepository.findByActive(roleId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Role does not exist with given id: " + roleId));
         role.setName(updatedRole.getName());
         role.setDescription(updatedRole.getDescription());
-        role.setUpdatedBy(updatedBy);
         Role updatedRoleObj = roleRepository.save(role);
         return roleMapper.toDto(updatedRoleObj);
     }

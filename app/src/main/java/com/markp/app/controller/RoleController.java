@@ -17,8 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.security.Principal;
-
 @RestController
 @RequestMapping("/api/roles")
 public class RoleController {
@@ -32,8 +30,8 @@ public class RoleController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<RoleDto> createRole(@RequestBody RoleDto roleDto, Principal principal) {
-        RoleDto savedRole = roleService.createRole(roleDto, principal.getName());
+    public ResponseEntity<RoleDto> createRole(@RequestBody RoleDto roleDto) {
+        RoleDto savedRole = roleService.createRole(roleDto);
         return new ResponseEntity<>(savedRole, HttpStatus.CREATED);
     }
 
@@ -57,9 +55,8 @@ public class RoleController {
     @PutMapping("{id}")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<RoleDto> updateRole(@PathVariable("id") Long roleId,
-                                              @RequestBody RoleDto updatedRole,
-                                              Principal principal) {
-        RoleDto roleDto = roleService.updateRole(roleId, updatedRole, principal.getName());
+                                              @RequestBody RoleDto updatedRole) {
+        RoleDto roleDto = roleService.updateRole(roleId, updatedRole);
         return ResponseEntity.ok(roleDto);
     }
 

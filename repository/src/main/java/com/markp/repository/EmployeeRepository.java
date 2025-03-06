@@ -21,11 +21,11 @@ public interface EmployeeRepository extends BaseRepository<Employee, Long> {
             "AND (cast(:createdDateEnd as timestamp) IS NULL OR e.createdDate <= :createdDateEnd) " +
             "AND (cast(:updatedDateStart as timestamp) IS NULL OR e.updatedDate >= :updatedDateStart) " +
             "AND (cast(:updatedDateEnd as timestamp) IS NULL OR e.updatedDate <= :updatedDateEnd)")
-    Page<Employee> findAllWithNonEncryptedFilters(@Param("email") String email,
-                                                  @Param("employmentStatus") String employmentStatus,
-                                                  @Param("createdDateStart") LocalDateTime createdDateStart,
-                                                  @Param("createdDateEnd") LocalDateTime createdDateEnd,
-                                                  @Param("updatedDateStart") LocalDateTime updatedDateStart,
-                                                  @Param("updatedDateEnd") LocalDateTime updatedDateEnd,
-                                                  Pageable pageable);
+    Page<Employee> findAllWithFilters(@Param("email") String email,
+                                      @Param("employmentStatus") String employmentStatus,
+                                      @Param("createdDateStart") LocalDateTime createdDateStart,
+                                      @Param("createdDateEnd") LocalDateTime createdDateEnd,
+                                      @Param("updatedDateStart") LocalDateTime updatedDateStart,
+                                      @Param("updatedDateEnd") LocalDateTime updatedDateEnd,
+                                      Pageable pageable);
 }

@@ -79,27 +79,12 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Transactional(readOnly = true)
     @LogExecutionTime
     public Page<EmployeeDto> getAllEmployees(EmployeeFilterRequest filterRequest, Pageable pageable) {
-        // fetch non-encrypted filters
-        Page<Employee> employeesPage = employeeRepository.findAllWithNonEncryptedFilters(
-                filterRequest.getEmail(), filterRequest.getEmploymentStatus(),
-                filterRequest.getCreatedDateStart(), filterRequest.getCreatedDateEnd(),
-                filterRequest.getUpdatedDateStart(), filterRequest.getUpdatedDateEnd(), pageable);
 
-        List<Employee> employees = employeesPage.getContent();
-
-        // filter in memory for encrypted fields
-        List<Employee> filteredEmployees = employees.stream()
-                .filter(employee -> (filterRequest.getFirstName() == null || employee.getFirstName().toLowerCase().contains(filterRequest.getFirstName().toLowerCase())))
-                .filter(employee -> (filterRequest.getLastName() == null || employee.getLastName().toLowerCase().contains(filterRequest.getLastName().toLowerCase())))
-                .collect(Collectors.toList());
-
-        int start = Math.min((int) pageable.getOffset(), filteredEmployees.size());
-        int end = Math.min((start + pageable.getPageSize()), filteredEmployees.size());
-        List<EmployeeDto> employeeDtos = filteredEmployees.subList(start, end).stream()
-                .map(employeeMapper::toDto)
-                .collect(Collectors.toList());
-
-        return new PageImpl<>(employeeDtos, pageable, filteredEmployees.size());
+        return employeeRepository
+                .findAllWithFilters(filterRequest.getEmail(), filterRequest.getEmploymentStatus(),
+                        filterRequest.getCreatedDateStart(), filterRequest.getCreatedDateEnd(),
+                        filterRequest.getUpdatedDateStart(), filterRequest.getUpdatedDateEnd(), pageable)
+                .map(employeeMapper::toDto);
     }
 
     @Override
