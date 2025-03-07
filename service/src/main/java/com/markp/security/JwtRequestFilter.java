@@ -23,8 +23,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
 
     @Autowired
-    public JwtRequestFilter (CustomUserDetailsService customUserDetailsService,
-                             JwtService jwtService) {
+    public JwtRequestFilter(CustomUserDetailsService customUserDetailsService, JwtService jwtService) {
         this.customUserDetailsService = customUserDetailsService;
         this.jwtService = jwtService;
     }
@@ -43,13 +42,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             try {
                 username = jwtService.extractUsername(jwt);
             } catch (ExpiredJwtException e) {
-                String isRefreshToken = request.getHeader("isRefreshToken");
-                String requestURL = request.getRequestURL().toString();
-                // Allow for Refresh Token creation if following conditions are true.
-                if (isRefreshToken != null && isRefreshToken.equals("true") && requestURL.contains("refreshToken")) {
-                    allowForRefreshToken(e, request);
-                } else
-                    request.setAttribute("exception", e);
+                request.setAttribute("exception", e);
             }
         }
 
@@ -67,16 +60,5 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             }
         }
         chain.doFilter(request, response);
-    }
-
-    private void allowForRefreshToken(ExpiredJwtException ex, HttpServletRequest request) {
-
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-                null, null, null);
-
-        SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-
-        request.setAttribute("claims", ex.getClaims());
-
     }
 }

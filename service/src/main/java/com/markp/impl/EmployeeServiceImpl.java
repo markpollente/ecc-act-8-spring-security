@@ -14,11 +14,7 @@ import com.markp.repository.HelpdeskTicketRepository;
 import com.markp.repository.RoleRepository;
 import com.markp.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -53,7 +49,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     @Transactional
     @LogExecutionTime
-    @CachePut(value = "employees", key = "#result.id")
     public EmployeeDto createEmployee(EmployeeDto employeeDto) {
         if (employeeRepository.existsByEmailAndDeletedFalse(employeeDto.getEmail())) {
             throw new ResourceNotFoundException("Email already exists: " + employeeDto.getEmail());
@@ -67,7 +62,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     @Transactional(readOnly = true)
     @LogExecutionTime
-    @Cacheable(value = "employees", key = "#employeeId")
     public EmployeeDto getEmployeeById(Long employeeId) {
         Employee employee = employeeRepository.findByActive(employeeId)
                 .orElseThrow(() ->
@@ -90,7 +84,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     @Transactional
     @LogExecutionTime
-    @CachePut(value = "employees", key = "#employeeId")
     public EmployeeDto updateEmployee(Long employeeId, EmployeeDto updatedEmployee) {
         Employee employee = employeeRepository.findByActive(employeeId)
                 .orElseThrow(() ->
@@ -122,7 +115,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     @Transactional
     @LogExecutionTime
-    @CacheEvict(value = "employees", key = "#employeeId")
     public void deleteEmployee(Long employeeId) {
         List<HelpdeskTicket> tickets = helpdeskTicketRepository.findByAssigneeIdAndDeletedFalse(employeeId);
         for (HelpdeskTicket ticket : tickets) {
@@ -139,7 +131,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     @Transactional
     @LogExecutionTime
-    @CachePut(value = "employees", key = "#employeeId")
     public EmployeeDto assignRoleToEmployee(Long employeeId, Long roleId) {
         Employee employee = employeeRepository.findByActive(employeeId)
                 .orElseThrow(() ->
@@ -157,7 +148,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     @Transactional(readOnly = true)
     @LogExecutionTime
-    @Cacheable(value = "employees", key = "#email")
     public EmployeeDto getEmployeeByEmail(String email) {
         Employee employee = employeeRepository.findByEmailAndDeletedFalse(email);
         if (employee == null) {

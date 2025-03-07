@@ -3,6 +3,7 @@ package com.markp.service;
 import com.markp.dto.RoleDto;
 import com.markp.exception.ResourceNotFoundException;
 import com.markp.impl.RoleServiceImpl;
+import com.markp.mapper.RoleMapper;
 import com.markp.model.Employee;
 import com.markp.model.Role;
 import com.markp.repository.EmployeeRepository;
@@ -12,6 +13,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,6 +26,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
@@ -35,6 +41,9 @@ public class RoleServiceImplTest {
     @Mock
     private EmployeeRepository employeeRepository;
 
+    @Mock
+    private RoleMapper roleMapper;
+
     @InjectMocks
     private RoleServiceImpl roleService;
 
@@ -44,13 +53,16 @@ public class RoleServiceImplTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        role = new Role(1L, "Admin", "Administrator role", null);
-        roleDto = new RoleDto(1L, "Admin", "Administrator role");
+        role = new Role("ADMIN", "Administrator role", new ArrayList<>());
+        role.setId(1L);
+        roleDto = new RoleDto("ADMIN", "Administrator role");
     }
 
     @Test
     void createRole() {
+        when(roleMapper.toEntity(any(RoleDto.class))).thenReturn(role);
         when(roleRepository.save(any(Role.class))).thenReturn(role);
+        when(roleMapper.toDto(any(Role.class))).thenReturn(roleDto);
 
         RoleDto savedRole = roleService.createRole(roleDto);
 
@@ -61,42 +73,46 @@ public class RoleServiceImplTest {
 
     @Test
     void getRoleById() {
-        when(roleRepository.findById(1L)).thenReturn(Optional.of(role));
+        when(roleRepository.findByActive(1L)).thenReturn(Optional.of(role));
+        when(roleMapper.toDto(any(Role.class))).thenReturn(roleDto);
 
         RoleDto foundRole = roleService.getRoleByID(1L);
 
         assertNotNull(foundRole);
         assertEquals(roleDto.getName(), foundRole.getName());
-        verify(roleRepository, times(1)).findById(1L);
+        verify(roleRepository, times(1)).findByActive(1L);
     }
 
     @Test
     void getAllRoles() {
-        when(roleRepository.findAll()).thenReturn(Arrays.asList(role));
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Role> rolePage = new PageImpl<>(Arrays.asList(role));
+        when(roleRepository.findAllActive(pageable)).thenReturn(rolePage);
 
-        List<RoleDto> roles = roleService.getAllRoles();
+        Page<RoleDto> roles = roleService.getAllRoles(0, 10);
 
         assertNotNull(roles);
-        assertEquals(1, roles.size());
-        verify(roleRepository, times(1)).findAll();
+        assertEquals(1, roles.getTotalElements());
+        verify(roleRepository, times(1)).findAllActive(pageable);
     }
 
     @Test
     void updateRole() {
-        when(roleRepository.findById(1L)).thenReturn(Optional.of(role));
+        when(roleRepository.findByActive(1L)).thenReturn(Optional.of(role));
         when(roleRepository.save(any(Role.class))).thenReturn(role);
+        when(roleMapper.toDto(any(Role.class))).thenReturn(roleDto);
 
         RoleDto updatedRole = roleService.updateRole(1L, roleDto);
 
         assertNotNull(updatedRole);
         assertEquals(roleDto.getName(), updatedRole.getName());
-        verify(roleRepository, times(1)).findById(1L);
+        verify(roleRepository, times(1)).findByActive(1L);
         verify(roleRepository, times(1)).save(any(Role.class));
     }
 
     @Test
     void deleteRole() {
-        when(roleRepository.findById(1L)).thenReturn(Optional.of(role));
+        when(roleRepository.findByActive(1L)).thenReturn(Optional.of(role));
         Employee employee = new Employee();
         employee.setRoles(new ArrayList<>(Arrays.asList(role)));
         when(employeeRepository.findAll()).thenReturn(Arrays.asList(employee));
@@ -104,16 +120,17 @@ public class RoleServiceImplTest {
 
         roleService.deleteRole(1L);
 
-        verify(roleRepository, times(1)).findById(1L);
+        verify(roleRepository, times(1)).findByActive(1L);
         verify(employeeRepository, times(1)).findAll();
-        verify(roleRepository, times(1)).deleteById(1L);
+        assertTrue(role.isDeleted());
+        verify(roleRepository, times(1)).save(role);
     }
 
     @Test
     void getRoleById_NotFound() {
-        when(roleRepository.findById(1L)).thenReturn(Optional.empty());
+        when(roleRepository.findByActive(1L)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> roleService.getRoleByID(1L));
-        verify(roleRepository, times(1)).findById(1L);
+        verify(roleRepository, times(1)).findByActive(1L);
     }
 }
