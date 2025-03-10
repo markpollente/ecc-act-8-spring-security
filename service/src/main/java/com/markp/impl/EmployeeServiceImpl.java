@@ -75,7 +75,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     public Page<EmployeeDto> getAllEmployees(EmployeeFilterRequest filterRequest, Pageable pageable) {
 
         return employeeRepository
-                .findAllWithFilters(filterRequest.getEmail(), filterRequest.getEmploymentStatus(),
+                .findAllWithFilters(filterRequest.getFirstName(), filterRequest.getLastName(), filterRequest.getEmail(),
+                        filterRequest.getEmploymentStatus(), filterRequest.getCreatedBy(), filterRequest.getUpdatedBy(),
                         filterRequest.getCreatedDateStart(), filterRequest.getCreatedDateEnd(),
                         filterRequest.getUpdatedDateStart(), filterRequest.getUpdatedDateEnd(), pageable)
                 .map(employeeMapper::toDto);

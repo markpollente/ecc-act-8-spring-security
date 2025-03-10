@@ -74,7 +74,8 @@ public class HelpdeskTicketServiceImpl implements HelpdeskTicketService {
         }
         return ticketRepository
                 .findAllWithFilters(filterRequest.getTicketNo(), filterRequest.getTitle(), filterRequest.getBody(), ticketStatus,
-                        filterRequest.getAssignee(), filterRequest.getCreatedDateStart(), filterRequest.getCreatedDateEnd(),
+                        filterRequest.getAssignee(), filterRequest.getCreatedBy(), filterRequest.getUpdatedBy(),
+                        filterRequest.getCreatedDateStart(), filterRequest.getCreatedDateEnd(),
                         filterRequest.getUpdatedDateStart(), filterRequest.getUpdatedDateEnd(), pageable)
                 .map(helpdeskTicketMapper::toDto);
     }

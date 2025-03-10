@@ -23,7 +23,9 @@ public interface HelpdeskTicketRepository extends BaseRepository<HelpdeskTicket,
             "AND (:title IS NULL OR t.title LIKE %:title%) " +
             "AND (:body IS NULL OR t.body LIKE %:body%) " +
             "AND (:status IS NULL OR t.status = :status) " +
-            "AND (:assignee IS NULL OR e.email LIKE %:assignee%) " +
+            "AND (:assignee IS NULL OR (e.firstName LIKE %:assignee% OR e.lastName LIKE %:assignee%)) " +
+            "AND (:createdBy IS NULL OR t.createdBy LIKE %:createdBy%) " +
+            "AND (:updatedBy IS NULL OR t.updatedBy LIKE %:updatedBy%)" +
             "AND (cast(:createdDateStart as timestamp) IS NULL OR t.createdDate >= :createdDateStart) " +
             "AND (cast(:createdDateEnd as timestamp) IS NULL OR t.createdDate <= :createdDateEnd) " +
             "AND (cast(:updatedDateStart as timestamp) IS NULL OR t.updatedDate >= :updatedDateStart) " +
@@ -33,6 +35,8 @@ public interface HelpdeskTicketRepository extends BaseRepository<HelpdeskTicket,
                                             @Param("body") String body,
                                             @Param("status") TicketStatus status,
                                             @Param("assignee") String assignee,
+                                            @Param("createdBy") String createdBy,
+                                            @Param("updatedBy") String updatedBy,
                                             @Param("createdDateStart") LocalDateTime createdDateStart,
                                             @Param("createdDateEnd") LocalDateTime createdDateEnd,
                                             @Param("updatedDateStart") LocalDateTime updatedDateStart,
