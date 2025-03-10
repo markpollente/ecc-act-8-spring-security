@@ -10,6 +10,9 @@ import java.time.LocalDateTime;
 @Setter
 public abstract class BaseFilterRequest {
 
+    private String createdBy;
+    private String updatedBy;
+
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime createdDateStart;
 

@@ -1,5 +1,6 @@
 package com.markp.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import jakarta.persistence.PrePersist;
@@ -30,6 +31,8 @@ public class EmployeeDto extends BaseDto {
     @Email(message = "Email should be valid")
     @NotBlank(message = "Email is required")
     private String email;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate birthday;
     private Integer age;
     private String address;
