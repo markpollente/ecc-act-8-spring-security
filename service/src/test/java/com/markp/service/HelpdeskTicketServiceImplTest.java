@@ -92,13 +92,13 @@ public class HelpdeskTicketServiceImplTest {
     void getAllTickets() {
         Pageable pageable = PageRequest.of(0, 10);
         Page<HelpdeskTicket> ticketPage = new PageImpl<>(Arrays.asList(ticket));
-        when(ticketRepository.findAllWithFilters(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(Pageable.class))).thenReturn(ticketPage);
+        when(ticketRepository.findAllWithFilters(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(Pageable.class))).thenReturn(ticketPage);
 
         Page<HelpdeskTicketDto> tickets = ticketService.getAllTickets(new HelpdeskTicketFilterRequest(), pageable);
 
         assertNotNull(tickets);
         assertEquals(1, tickets.getTotalElements());
-        verify(ticketRepository, times(1)).findAllWithFilters(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(Pageable.class));
+        verify(ticketRepository, times(1)).findAllWithFilters(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(Pageable.class));
     }
 
     @Test

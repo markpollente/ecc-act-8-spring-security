@@ -108,13 +108,13 @@ public class EmployeeServiceImplTest {
     void getAllEmployees() {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Employee> employeePage = new PageImpl<>(Arrays.asList(employee));
-        when(employeeRepository.findAllWithFilters(any(), any(), any(), any(), any(), any(), any(Pageable.class))).thenReturn(employeePage);
+        when(employeeRepository.findAllWithFilters(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(Pageable.class))).thenReturn(employeePage);
 
         Page<EmployeeDto> employees = employeeService.getAllEmployees(new EmployeeFilterRequest(), pageable);
 
         assertNotNull(employees);
         assertEquals(1, employees.getTotalElements());
-        verify(employeeRepository, times(1)).findAllWithFilters(any(), any(), any(), any(), any(), any(), any(Pageable.class));
+        verify(employeeRepository, times(1)).findAllWithFilters(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(Pageable.class));
     }
 
     @Test
