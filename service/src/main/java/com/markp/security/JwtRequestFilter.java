@@ -2,6 +2,7 @@ package com.markp.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -13,7 +14,10 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 
 @Component
@@ -51,11 +55,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             UserDetails userDetails = this.customUserDetailsService.loadUserByUsername(username);
 
             if (jwtService.validateToken(jwt, userDetails)) {
-
+                Claims claims = jwtService.extractAllClaims(jwt);
+                List<String> roles = claims.get("roles", List.class);
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
                         null,
-                        userDetails.getAuthorities()
+                        userDetails.getAuthorities() //roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList())
                 );
                 authToken.setDetails(
                         new WebAuthenticationDetailsSource().buildDetails(request)
