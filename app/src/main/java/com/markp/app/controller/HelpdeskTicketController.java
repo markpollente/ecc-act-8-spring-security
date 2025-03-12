@@ -41,28 +41,28 @@ public class HelpdeskTicketController {
     }
 
     @GetMapping("{id}")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<HelpdeskTicketDto> getTicketById(@PathVariable("id") Long ticketId) {
         HelpdeskTicketDto ticketDto = ticketService.getTicketById(ticketId);
         return ResponseEntity.ok(ticketDto);
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public ResponseEntity<Page<HelpdeskTicketDto>> getAllTickets(HelpdeskTicketFilterRequest filterRequest, Pageable pageable) {
         Page<HelpdeskTicketDto> tickets = ticketService.getAllTickets(filterRequest, pageable);
         return ResponseEntity.ok(tickets);
     }
 
     @GetMapping("/status/{status}")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<HelpdeskTicketDto>> getTicketsByStatus(@PathVariable("status") String status) {
         List<HelpdeskTicketDto> tickets = ticketService.getTicketsByStatus(status);
         return ResponseEntity.ok(tickets);
     }
 
     @GetMapping("/assignee/{assigneeId}")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<HelpdeskTicketDto>> getTicketsByAssignee(@PathVariable("assigneeId") Long assigneeId) {
         List<HelpdeskTicketDto> tickets = ticketService.getTicketsByAssignee(assigneeId);
         return ResponseEntity.ok(tickets);
@@ -84,7 +84,7 @@ public class HelpdeskTicketController {
     }
 
     @PutMapping("{ticketId}/assign/{employeeId}")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<HelpdeskTicketDto> assignTicketToEmployee(@PathVariable("ticketId") Long ticketId,
                                                                     @PathVariable("employeeId") Long employeeId) {
         HelpdeskTicketDto ticketDto = ticketService.assignTicketToEmployee(ticketId, employeeId);
@@ -92,7 +92,7 @@ public class HelpdeskTicketController {
     }
 
     @PutMapping("{ticketId}/remark")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<HelpdeskTicketDto> addRemarkAndUpdateStatus(@PathVariable("ticketId") Long ticketId,
                                                                       @RequestParam("remarks") String remarks,
                                                                       @RequestParam("status") String status) {

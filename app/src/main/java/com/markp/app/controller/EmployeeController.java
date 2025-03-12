@@ -88,28 +88,28 @@ public class EmployeeController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EmployeeDto> createEmployee(@Valid @RequestBody EmployeeDto employeeDto) {
         EmployeeDto savedEmployee = employeeService.createEmployee(employeeDto);
         return new ResponseEntity<>(savedEmployee, HttpStatus.CREATED);
     }
 
     @GetMapping("{id}")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EmployeeDto> getEmployeeById(@PathVariable("id") Long employeeId) {
         EmployeeDto employeeDto = employeeService.getEmployeeById(employeeId);
         return ResponseEntity.ok(employeeDto);
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<EmployeeDto>> getAllEmployees(EmployeeFilterRequest filterRequest, Pageable pageable) {
         Page<EmployeeDto> employees = employeeService.getAllEmployees(filterRequest, pageable);
         return ResponseEntity.ok(employees);
     }
 
     @PutMapping("{id}")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EmployeeDto> updateEmployee(@PathVariable("id") Long employeeId,
                                                       @RequestBody EmployeeDto updatedEmployee) {
         EmployeeDto employeeDto = employeeService.updateEmployee(employeeId, updatedEmployee);
@@ -117,14 +117,14 @@ public class EmployeeController {
     }
 
     @DeleteMapping("{id}")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteEmployee(@PathVariable("id") Long employeeId) {
         employeeService.deleteEmployee(employeeId);
         return ResponseEntity.ok("Employee deleted successfully.");
     }
 
     @PutMapping("{employeeId}/assign-role/{roleId}")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EmployeeDto> assignRoleToEmployee(@PathVariable("employeeId") Long employeeId,
                                                             @PathVariable("roleId") Long roleId) {
         EmployeeDto employeeDto = employeeService.assignRoleToEmployee(employeeId, roleId);

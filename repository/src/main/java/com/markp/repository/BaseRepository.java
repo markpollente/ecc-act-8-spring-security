@@ -12,12 +12,6 @@ import java.util.Optional;
 @NoRepositoryBean
 public interface BaseRepository<T, ID> extends JpaRepository<T, ID> {
 
-    @Query("SELECT e FROM #{#entityName} e WHERE e.deleted = false")
-    List<T> findAllActive();
-
-    @Query("SELECT e FROM #{#entityName} e WHERE e.deleted = false")
-    Page<T> findAllActive(Pageable pageable);
-
     @Query("SELECT e FROM #{#entityName} e WHERE e.id = ?1 AND e.deleted = false")
     Optional<T> findByActive(ID id);
 }

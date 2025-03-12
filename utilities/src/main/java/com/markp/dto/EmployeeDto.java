@@ -32,7 +32,6 @@ public class EmployeeDto extends BaseDto {
     @NotBlank(message = "Email is required")
     private String email;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate birthday;
     private Integer age;
     private String address;

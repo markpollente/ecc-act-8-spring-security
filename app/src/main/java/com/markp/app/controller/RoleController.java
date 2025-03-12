@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/roles")
+@PreAuthorize("hasRole('ADMIN')")
 public class RoleController {
 
     private final RoleService roleService;
@@ -29,21 +30,18 @@ public class RoleController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<RoleDto> createRole(@RequestBody RoleDto roleDto) {
         RoleDto savedRole = roleService.createRole(roleDto);
         return new ResponseEntity<>(savedRole, HttpStatus.CREATED);
     }
 
     @GetMapping("{id}")
-    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<RoleDto> getRoleById(@PathVariable("id") Long roleId) {
         RoleDto roleDto = roleService.getRoleByID(roleId);
         return ResponseEntity.ok(roleDto);
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<Page<RoleDto>> getAllRoles(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
@@ -53,7 +51,6 @@ public class RoleController {
     }
 
     @PutMapping("{id}")
-    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<RoleDto> updateRole(@PathVariable("id") Long roleId,
                                               @RequestBody RoleDto updatedRole) {
         RoleDto roleDto = roleService.updateRole(roleId, updatedRole);
@@ -61,7 +58,6 @@ public class RoleController {
     }
 
     @DeleteMapping("{id}")
-    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<String> deleteRole(@PathVariable("id") Long roleId) {
         roleService.deleteRole(roleId);
         return ResponseEntity.ok(("Role deleted successfully."));
