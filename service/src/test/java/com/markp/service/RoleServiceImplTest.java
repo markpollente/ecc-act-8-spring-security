@@ -2,7 +2,7 @@ package com.markp.service;
 
 import com.markp.dto.RoleDto;
 import com.markp.exception.ResourceNotFoundException;
-import com.markp.impl.RoleServiceImpl;
+import com.markp.service.impl.RoleServiceImpl;
 import com.markp.mapper.RoleMapper;
 import com.markp.model.Employee;
 import com.markp.model.Role;
@@ -20,7 +20,6 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

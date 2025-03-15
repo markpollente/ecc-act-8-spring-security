@@ -1,4 +1,4 @@
-package com.markp.impl;
+package com.markp.service.impl;
 
 import com.markp.dto.HelpdeskTicketDto;
 import com.markp.dto.request.HelpdeskTicketFilterRequest;
