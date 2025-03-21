@@ -43,7 +43,7 @@ public class HelpdeskTicketController {
     }
 
     @GetMapping("{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public ResponseEntity<HelpdeskTicketDto> getTicketById(@PathVariable("id") Long ticketId) {
         HelpdeskTicketDto ticketDto = ticketService.getTicketById(ticketId);
         return ResponseEntity.ok(ticketDto);
@@ -86,7 +86,7 @@ public class HelpdeskTicketController {
     }
 
     @PutMapping("{ticketId}/assign/{employeeId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public ResponseEntity<HelpdeskTicketDto> assignTicketToEmployee(@PathVariable("ticketId") Long ticketId,
                                                                     @PathVariable("employeeId") Long employeeId) {
         HelpdeskTicketDto ticketDto = ticketService.assignTicketToEmployee(ticketId, employeeId);
@@ -94,7 +94,7 @@ public class HelpdeskTicketController {
     }
 
     @PutMapping("{ticketId}/remark")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public ResponseEntity<HelpdeskTicketDto> addRemarkAndUpdateStatus(@PathVariable("ticketId") Long ticketId,
                                                                       @RequestParam("remarks") String remarks,
                                                                       @RequestParam("status") String status) {
