@@ -29,7 +29,13 @@ public interface HelpdeskTicketRepository extends BaseRepository<HelpdeskTicket,
             "AND (:title IS NULL OR t.title LIKE %:title%) " +
             "AND (:body IS NULL OR t.body LIKE %:body%) " +
             "AND (:status IS NULL OR t.status = :status) " +
-            "AND (:assignee IS NULL OR (e.firstName LIKE %:assignee% OR e.lastName LIKE %:assignee%)) " +
+            "AND (:assignee IS NULL OR " +
+                "(e IS NOT NULL AND (" +
+                    "CAST(e.firstName AS string) LIKE %:assignee% OR " +  // Search by first name
+                    "CAST(e.lastName AS string) LIKE %:assignee% OR " +  // Search by last name
+                    "CONCAT(CAST(e.firstName AS string), ' ', CAST(e.lastName AS string)) LIKE %:assignee%" +  // Search by full name
+                "))" +
+            ") " +
             "AND (:createdBy IS NULL OR t.createdBy LIKE %:createdBy%) " +
             "AND (:updatedBy IS NULL OR t.updatedBy LIKE %:updatedBy%)" +
             "AND (cast(:createdDateStart as timestamp) IS NULL OR t.createdDate >= :createdDateStart) " +
