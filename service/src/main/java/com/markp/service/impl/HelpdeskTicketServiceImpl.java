@@ -19,7 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Validated
@@ -195,5 +197,39 @@ public class HelpdeskTicketServiceImpl implements HelpdeskTicketService {
         }
         HelpdeskTicket updatedTicket = ticketRepository.save(ticket);
         return helpdeskTicketMapper.toDto(updatedTicket);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @LogExecutionTime
+    public Map<String, Long> getTicketCountsByStatus() {
+        Map<String, Long> counts = new HashMap<>();
+        for (TicketStatus status : TicketStatus.values()) {
+            counts.put(status.name(), ticketRepository.countByStatusAndDeletedFalse(status));
+        }
+        return counts;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<String, Long> getPersonalTicketCounts(String email) {
+        Map<String, Long> counts = new HashMap<>();
+
+        Employee employee = employeeRepository.findByEmailAndDeletedFalse(email);
+        if (employee == null) {
+            return counts;
+        }
+
+        for (TicketStatus status : TicketStatus.values()) {
+            long createdCount = ticketRepository.countByCreatedByAndStatusAndDeletedFalse(email, status);
+            counts.put("CREATED_" + status.name(), createdCount);
+        }
+
+        for (TicketStatus status : TicketStatus.values()) {
+            long assignedCount = ticketRepository.countByAssigneeIdAndStatusAndDeletedFalse(employee.getId(), status);
+            counts.put("ASSIGNED_" + status.name(), assignedCount);
+        }
+
+        return counts;
     }
 }

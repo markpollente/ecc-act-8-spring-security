@@ -18,6 +18,12 @@ public interface HelpdeskTicketRepository extends BaseRepository<HelpdeskTicket,
 
     List<HelpdeskTicket> findByCreatedByAndDeletedFalse(String email);
 
+    long countByStatusAndDeletedFalse(TicketStatus status);
+
+    long countByCreatedByAndStatusAndDeletedFalse(String createdBy, TicketStatus status);
+
+    long countByAssigneeIdAndStatusAndDeletedFalse(Long assigneeId, TicketStatus status);
+
     @Query("SELECT t FROM HelpdeskTicket t LEFT JOIN t.assignee e WHERE t.deleted = false " +
             "AND (:ticketNo IS NULL OR str(t.ticketNo) LIKE %:ticketNo%) " +
             "AND (:title IS NULL OR t.title LIKE %:title%) " +

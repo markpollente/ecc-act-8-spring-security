@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Map;
 
 public interface HelpdeskTicketService {
     HelpdeskTicketDto createTicket(HelpdeskTicketDto ticketDto);
@@ -29,4 +30,8 @@ public interface HelpdeskTicketService {
     HelpdeskTicketDto addRemarkAndUpdateStatus(Long ticketId, String remarks, String status);
 
     HelpdeskTicketDto addRemarkAndUpdateStatusForEmployee(Long ticketId, String remarks, String status, String updatedBy);
+
+    Map<String, Long> getTicketCountsByStatus();
+
+    Map<String, Long> getPersonalTicketCounts(String email);
 }

@@ -20,7 +20,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/tickets")
@@ -98,5 +100,19 @@ public class HelpdeskTicketController {
                                                                       @RequestParam("status") String status) {
         HelpdeskTicketDto ticketDto = ticketService.addRemarkAndUpdateStatus(ticketId, remarks, status);
         return ResponseEntity.ok(ticketDto);
+    }
+
+    @GetMapping("/counts-by-status")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
+    public ResponseEntity<Map<String, Long>> getTicketCountsByStatus() {
+        Map<String, Long> counts = ticketService.getTicketCountsByStatus();
+        return ResponseEntity.ok(counts);
+    }
+
+    @GetMapping("/profile/ticket-counts")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
+    public ResponseEntity<Map<String, Long>> getPersonalTicketCounts(Principal principal) {
+        Map<String, Long> counts = ticketService.getPersonalTicketCounts(principal.getName());
+        return ResponseEntity.ok(counts);
     }
 }
