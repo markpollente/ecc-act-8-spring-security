@@ -1,6 +1,7 @@
 package com.markp.service.impl;
 
 import com.markp.dto.EmployeeDto;
+import com.markp.dto.EmployeeReferenceDto;
 import com.markp.dto.request.EmployeeFilterRequest;
 import com.markp.exception.ResourceNotFoundException;
 import com.markp.logging.LogExecutionTime;
@@ -160,14 +161,18 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     @Transactional(readOnly = true)
     @LogExecutionTime
-    public Page<EmployeeDto> getEmployeeDirectory(Pageable pageable) {
-        Page<Employee> employees = employeeRepository.findByDeletedFalse(pageable);
-        return employees.map(employee -> {
-            EmployeeDto dto = new EmployeeDto();
-            dto.setId(employee.getId());
-            dto.setFirstName(employee.getFirstName());
-            dto.setLastName(employee.getLastName());
-            return dto;
-        });
+    public List<EmployeeReferenceDto> getEmployeeReferences() {
+        List<Employee> employees = employeeRepository.findByDeletedFalse();
+
+        return employees.stream()
+                .map(employee -> {
+                    EmployeeReferenceDto dto = new EmployeeReferenceDto();
+                    dto.setId(employee.getId());
+                    dto.setFirstName(employee.getFirstName());
+                    dto.setLastName(employee.getLastName());
+                    dto.setFullName(employee.getFirstName() + " " + employee.getLastName());
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 }

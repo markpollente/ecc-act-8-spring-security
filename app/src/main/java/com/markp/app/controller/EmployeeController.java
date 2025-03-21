@@ -1,6 +1,7 @@
 package com.markp.app.controller;
 
 import com.markp.dto.EmployeeDto;
+import com.markp.dto.EmployeeReferenceDto;
 import com.markp.dto.HelpdeskTicketDto;
 import com.markp.dto.request.EmployeeFilterRequest;
 import com.markp.dto.request.LoginRequest;
@@ -141,10 +142,10 @@ public class EmployeeController {
         return ResponseEntity.ok(ticketDto);
     }
 
-    @GetMapping("/directory")
+    @GetMapping("/references")
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
-    public ResponseEntity<Page<EmployeeDto>> getEmployeeDirectory(Pageable pageable) {
-        Page<EmployeeDto> employees = employeeService.getEmployeeDirectory(pageable);
+    public ResponseEntity<List<EmployeeReferenceDto>> getEmployeeReferences() {
+        List<EmployeeReferenceDto> employees = employeeService.getEmployeeReferences();
         return ResponseEntity.ok(employees);
     }
 }
