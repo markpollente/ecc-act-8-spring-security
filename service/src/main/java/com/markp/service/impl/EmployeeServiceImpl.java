@@ -156,4 +156,18 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
         return employeeMapper.toDto(employee);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    @LogExecutionTime
+    public Page<EmployeeDto> getEmployeeDirectory(Pageable pageable) {
+        Page<Employee> employees = employeeRepository.findByDeletedFalse(pageable);
+        return employees.map(employee -> {
+            EmployeeDto dto = new EmployeeDto();
+            dto.setId(employee.getId());
+            dto.setFirstName(employee.getFirstName());
+            dto.setLastName(employee.getLastName());
+            return dto;
+        });
+    }
 }

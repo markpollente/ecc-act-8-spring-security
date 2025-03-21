@@ -232,4 +232,42 @@ public class HelpdeskTicketServiceImpl implements HelpdeskTicketService {
 
         return counts;
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    @LogExecutionTime
+    public Page<HelpdeskTicketDto> getRelevantTickets(HelpdeskTicketFilterRequest filterRequest, String userEmail, Pageable pageable) {
+        Employee employee = employeeRepository.findByEmailAndDeletedFalse(userEmail);
+        if (employee == null) {
+            return Page.empty(pageable);
+        }
+
+        TicketStatus ticketStatus = null;
+        if (filterRequest.getStatus() != null && !filterRequest.getStatus().isEmpty()) {
+            try {
+                ticketStatus = TicketStatus.valueOf(filterRequest.getStatus().toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid status: '" + filterRequest.getStatus() + "'. Valid statuses are: " +
+                        Arrays.stream(TicketStatus.values()).map(Enum::name).collect(Collectors.joining(", ")), e);
+            }
+        }
+
+        return ticketRepository
+                .findRelevantTicketsWithFilters(
+                        filterRequest.getTicketNo(),
+                        filterRequest.getTitle(),
+                        filterRequest.getBody(),
+                        ticketStatus,
+                        filterRequest.getAssignee(),
+                        userEmail,
+                        employee.getId(),
+                        filterRequest.getCreatedBy(),
+                        filterRequest.getUpdatedBy(),
+                        filterRequest.getCreatedDateStart(),
+                        filterRequest.getCreatedDateEnd(),
+                        filterRequest.getUpdatedDateStart(),
+                        filterRequest.getUpdatedDateEnd(),
+                        pageable)
+                .map(helpdeskTicketMapper::toDto);
+    }
 }

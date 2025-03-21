@@ -37,4 +37,6 @@ public interface EmployeeRepository extends BaseRepository<Employee, Long> {
                                       @Param("updatedDateStart") LocalDateTime updatedDateStart,
                                       @Param("updatedDateEnd") LocalDateTime updatedDateEnd,
                                       Pageable pageable);
+
+    Page<Employee> findByDeletedFalse(Pageable pageable);
 }

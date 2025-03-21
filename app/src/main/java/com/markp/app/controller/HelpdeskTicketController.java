@@ -115,4 +115,14 @@ public class HelpdeskTicketController {
         Map<String, Long> counts = ticketService.getPersonalTicketCounts(principal.getName());
         return ResponseEntity.ok(counts);
     }
+
+    @GetMapping("/relevant")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
+    public ResponseEntity<Page<HelpdeskTicketDto>> getRelevantTickets(
+            HelpdeskTicketFilterRequest filterRequest,
+            Pageable pageable,
+            Principal principal) {
+        Page<HelpdeskTicketDto> tickets = ticketService.getRelevantTickets(filterRequest, principal.getName(), pageable);
+        return ResponseEntity.ok(tickets);
+    }
 }

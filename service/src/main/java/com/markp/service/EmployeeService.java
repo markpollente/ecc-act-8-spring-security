@@ -19,4 +19,6 @@ public interface EmployeeService {
     EmployeeDto assignRoleToEmployee(Long employeeId, Long roleId);
 
     EmployeeDto getEmployeeByEmail(String email);
+
+    Page<EmployeeDto> getEmployeeDirectory(Pageable pageable);
 }

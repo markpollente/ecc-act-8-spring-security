@@ -140,4 +140,11 @@ public class EmployeeController {
         HelpdeskTicketDto ticketDto = helpdeskTicketService.addRemarkAndUpdateStatusForEmployee(ticketId, remarks, status, principal.getName());
         return ResponseEntity.ok(ticketDto);
     }
+
+    @GetMapping("/directory")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
+    public ResponseEntity<Page<EmployeeDto>> getEmployeeDirectory(Pageable pageable) {
+        Page<EmployeeDto> employees = employeeService.getEmployeeDirectory(pageable);
+        return ResponseEntity.ok(employees);
+    }
 }

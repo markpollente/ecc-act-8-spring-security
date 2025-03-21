@@ -34,4 +34,6 @@ public interface HelpdeskTicketService {
     Map<String, Long> getTicketCountsByStatus();
 
     Map<String, Long> getPersonalTicketCounts(String email);
+
+    Page<HelpdeskTicketDto> getRelevantTickets(HelpdeskTicketFilterRequest filterRequest, String userEmail, Pageable pageable);
 }
