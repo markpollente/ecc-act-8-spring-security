@@ -110,7 +110,10 @@ public class HelpdeskTicketServiceImpl implements HelpdeskTicketService {
     @Transactional(readOnly = true)
     @LogExecutionTime
     public List<HelpdeskTicketDto> getTicketsByCreator(String createdBy) {
-        List<HelpdeskTicket> tickets = ticketRepository.findByCreatedByAndDeletedFalse(createdBy);
+        Employee employee = employeeRepository.findByEmailAndDeletedFalse(createdBy);
+        String employeeFullName = employee.getFirstName() + " " + employee.getLastName();
+        List<HelpdeskTicket> tickets = ticketRepository.findByCreatedByAndDeletedFalse(employeeFullName);
+
         return tickets.stream().map(helpdeskTicketMapper::toDto)
                 .collect(Collectors.toList());
     }
