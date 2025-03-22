@@ -33,9 +33,9 @@ public class HelpdeskTicketServiceImpl implements HelpdeskTicketService {
     private final HelpdeskTicketMapper helpdeskTicketMapper;
 
     @Autowired
-    public HelpdeskTicketServiceImpl (HelpdeskTicketRepository ticketRepository,
-                                      EmployeeRepository employeeRepository,
-                                      HelpdeskTicketMapper helpdeskTicketMapper) {
+    public HelpdeskTicketServiceImpl(HelpdeskTicketRepository ticketRepository,
+                                     EmployeeRepository employeeRepository,
+                                     HelpdeskTicketMapper helpdeskTicketMapper) {
         this.ticketRepository = ticketRepository;
         this.employeeRepository = employeeRepository;
         this.helpdeskTicketMapper = helpdeskTicketMapper;
@@ -220,8 +220,10 @@ public class HelpdeskTicketServiceImpl implements HelpdeskTicketService {
             return counts;
         }
 
+        String employeeFullName = employee.getFirstName() + " " + employee.getLastName();
+
         for (TicketStatus status : TicketStatus.values()) {
-            long createdCount = ticketRepository.countByCreatedByAndStatusAndDeletedFalse(email, status);
+            long createdCount = ticketRepository.countByCreatedByAndStatusAndDeletedFalse(employeeFullName, status);
             counts.put("CREATED_" + status.name(), createdCount);
         }
 
