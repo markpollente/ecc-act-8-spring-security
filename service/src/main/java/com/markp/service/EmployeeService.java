@@ -24,4 +24,6 @@ public interface EmployeeService {
     EmployeeDto getEmployeeByEmail(String email);
 
     List<EmployeeReferenceDto> getEmployeeReferences();
+
+    EmployeeDto updateEmployeeProfile(String email, EmployeeDto updatedProfile);
 }

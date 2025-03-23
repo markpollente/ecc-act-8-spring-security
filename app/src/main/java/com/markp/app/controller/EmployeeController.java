@@ -31,7 +31,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/employees")
@@ -71,6 +73,24 @@ public class EmployeeController {
     public ResponseEntity<EmployeeDto> getEmployeeProfile(Principal principal) {
         EmployeeDto employeeDto = employeeService.getEmployeeByEmail(principal.getName());
         return ResponseEntity.ok(employeeDto);
+    }
+
+    @PutMapping("/profile")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
+    public ResponseEntity<Map<String, Object>> updateEmployeeProfile(@RequestBody EmployeeDto updatedProfile, Principal principal) {
+        String currentEmail = principal.getName();
+        EmployeeDto updatedEmployee = employeeService.updateEmployeeProfile(principal.getName(), updatedProfile);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("employee", updatedEmployee);
+
+        boolean emailChanged = !currentEmail.equals(updatedEmployee.getEmail());
+        response.put("emailChanged", emailChanged);
+
+        if (emailChanged) {
+            response.put("message", "Email address updated. Please log in with your new email address.");
+        }
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/profile/filed")

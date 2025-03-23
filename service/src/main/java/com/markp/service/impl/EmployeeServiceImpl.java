@@ -175,4 +175,37 @@ public class EmployeeServiceImpl implements EmployeeService {
                 })
                 .collect(Collectors.toList());
     }
+
+    @Override
+    @Transactional
+    @LogExecutionTime
+    public EmployeeDto updateEmployeeProfile(String currentEmail, EmployeeDto updatedProfile) {
+        Employee employee = employeeRepository.findByEmailAndDeletedFalse(currentEmail);
+        if (employee == null) {
+            throw new ResourceNotFoundException("Employee does not exist with given email: " + currentEmail);
+        }
+
+        if (updatedProfile.getEmail() != null && !updatedProfile.getEmail().equals(currentEmail)) {
+            if (employeeRepository.existsByEmailAndDeletedFalse(updatedProfile.getEmail())) {
+                throw new IllegalArgumentException("Email address is already in use: " + updatedProfile.getEmail());
+            }
+
+            employee.setEmail(updatedProfile.getEmail());
+        }
+
+        employee.setFirstName(updatedProfile.getFirstName());
+        employee.setLastName(updatedProfile.getLastName());
+        employee.setBirthday(updatedProfile.getBirthday());
+        employee.setAge(employee.getAge());
+        employee.setAddress(updatedProfile.getAddress());
+        employee.setContactNumber(updatedProfile.getContactNumber());
+        employee.setEmploymentStatus(updatedProfile.getEmploymentStatus());
+
+        if (updatedProfile.getPassword() != null && !updatedProfile.getPassword().isEmpty()) {
+            employee.setPassword(passwordEncoder.encode(updatedProfile.getPassword()));
+        }
+
+        Employee updatedEmployeeObj = employeeRepository.save(employee);
+        return employeeMapper.toDto(updatedEmployeeObj);
+    }
 }
